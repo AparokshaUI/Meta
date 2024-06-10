@@ -1,0 +1,14 @@
+.DS_Store
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/config/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+/Package.resolved
+.Ulysses-Group.plist
+/.docc-build
+/io.github.AparokshaUI.Generation.json
+/.vscode

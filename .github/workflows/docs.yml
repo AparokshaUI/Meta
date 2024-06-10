@@ -1,0 +1,57 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  Deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Libadwaita
+        run: |
+          brew update
+          brew install libadwaita
+          sed -i '' 's/-I..includedir.//g' $(brew --prefix)/Library/Homebrew/os/mac/pkgconfig/*/libffi.pc
+      - name: Clone DocC Repo
+        run: |
+          git clone https://github.com/AparokshaUI/Adwaita.docc Sources/Adwaita/Adwaita.docc
+          rm Sources/Adwaita/Adwaita.docc/LICENSE.md
+          rm Sources/Adwaita/Adwaita.docc/README.md
+          y | rm -r Sources/Adwaita/Adwaita.docc/.git
+      - name: Build Docs
+        run: |
+          xcrun xcodebuild docbuild \
+            -scheme Adwaita \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath "$PWD/.derivedData"
+          xcrun docc process-archive transform-for-static-hosting \
+            "$PWD/.derivedData/Build/Products/Debug/Adwaita.doccarchive" \
+            --output-path "docs" \
+            --hosting-base-path "adwaita-swift"
+      - name: Modify Docs
+        run: |
+          echo "<script>window.location.href += \"/documentation/adwaita\"</script>" > docs/index.html;
+          sed -i '' 's/#06f/#ea3358/g' docs/css/documentation-topic~topic~tutorials-overview.d6f5411c.css
+          sed -i '' 's/,2px/,10px/g' docs/css/index.038e887c.css
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
