@@ -8,7 +8,7 @@
 import Observation
 
 /// A storage for `@State` properties.
-public struct StateWrapper: Widget {
+public struct StateWrapper: ConvenienceWidget {
 
     /// The content.
     var content: () -> Body

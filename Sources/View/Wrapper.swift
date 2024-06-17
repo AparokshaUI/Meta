@@ -6,7 +6,7 @@
 //
 
 /// Wrap a view into a single widget.
-public struct Wrapper: Widget {
+public struct Wrapper: ConvenienceWidget {
 
     /// The content.
     var content: Body

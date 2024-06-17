@@ -75,7 +75,7 @@ extension AnyView {
 
     /// Whether the view can be rendered in a certain environment.
     func renderable<WidgetType>(type: WidgetType.Type) -> Bool {
-        self as? WidgetType != nil || self as? SimpleView != nil || self as? View != nil
+        self as? WidgetType != nil || self as? SimpleView != nil || self as? View != nil || self as? ConvenienceWidget != nil
     }
 
 }
