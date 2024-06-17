@@ -43,7 +43,12 @@ extension AnyView {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the widgets.
-    public func updateStorage<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+    public func updateStorage<WidgetType>(
+        _ storage: ViewStorage,
+        modifiers: [(AnyView) -> AnyView],
+        updateProperties: Bool,
+        type: WidgetType.Type
+    ) {
         let modified = getModified(modifiers: modifiers)
         if let widget = modified as? Widget {
             widget.update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
@@ -75,7 +80,10 @@ extension AnyView {
 
     /// Whether the view can be rendered in a certain environment.
     func renderable<WidgetType>(type: WidgetType.Type) -> Bool {
-        self as? WidgetType != nil || self as? SimpleView != nil || self as? View != nil || self as? ConvenienceWidget != nil
+        self as? WidgetType != nil
+        || self as? SimpleView != nil
+        || self as? View != nil
+        || self as? ConvenienceWidget != nil
     }
 
 }

@@ -51,7 +51,12 @@ public struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the widgets.
-    public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+    public func update<WidgetType>(
+        _ storage: ViewStorage,
+        modifiers: [(AnyView) -> AnyView],
+        updateProperties: Bool,
+        type: WidgetType.Type
+    ) {
         var updateProperties = storage.fields[updateID] as? Bool ?? false
         storage.fields[updateID] = false
         for property in state {

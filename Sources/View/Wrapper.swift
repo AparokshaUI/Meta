@@ -33,7 +33,12 @@ public struct Wrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The widget types.
-    public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+    public func update<WidgetType>(
+        _ storage: ViewStorage,
+        modifiers: [(AnyView) -> AnyView],
+        updateProperties: Bool,
+        type: WidgetType.Type
+    ) {
         guard let storages = storage.content[.mainContent] else {
             return
         }

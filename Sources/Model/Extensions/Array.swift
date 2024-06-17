@@ -55,7 +55,12 @@ extension Array: AnyView where Element == AnyView {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the widgets.
-    public func update<WidgetType>(_ storage: [ViewStorage], modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+    public func update<WidgetType>(
+        _ storage: [ViewStorage],
+        modifiers: [(AnyView) -> AnyView],
+        updateProperties: Bool,
+        type: WidgetType.Type
+    ) {
         for (index, element) in enumerated() where element.renderable(type: type) {
             if let storage = storage[safe: index] {
                 element
