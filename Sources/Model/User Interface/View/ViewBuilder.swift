@@ -53,40 +53,6 @@ public enum ViewBuilder {
         component
     }
 
-    // TODO: Add support for optionals, building either
-    /*
-    /// Enables support for `if` statements without an `else`.
-    /// - Parameter component: An optional component.
-    /// - Returns: A nonoptional component.
-    public static func buildOptional(_ component: Component?) -> Component {
-        .element(
-            Bin()
-                .child {
-                    if let component {
-                        buildFinalResult(component)
-                    } else {
-                        []
-                    }
-                }
-                .visible(component != nil)
-        )
-    }
-
-    /// Enables support for `if`-`else` and `switch` statements.
-    /// - Parameter component: A component.
-    /// - Returns: The component.
-    public static func buildEither(first component: Component) -> Component {
-        .element(ViewStack(id: true) { _ in buildFinalResult(component) })
-    }
-
-    /// Enables support for `if`-`else` and `switch` statements.
-    /// - Parameter component: A component.
-    /// - Returns: The component.
-    public static func buildEither(second component: Component) -> Component {
-        .element(ViewStack(id: false) { _ in buildFinalResult(component) })
-    }
-    */
-
     /// Convert a component to an array of elements.
     /// - Parameter component: The component to convert.
     /// - Returns: The generated array of elements.

@@ -18,7 +18,7 @@ extension AnyView {
     /// Get the view's debug tree.
     /// - Parameter parameters: Whether the widget parameters should be included in the debug tree.
     /// - Returns: A textual description.
-    public func getDebugTree<ViewType>(parameters: Bool, type: ViewType.Type) -> String {
+    public func getDebugTree<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
         if let body = self as? Body {
             return body.getBodyDebugTree(parameters: parameters, type: type)
         }
@@ -42,21 +42,24 @@ extension AnyView {
     ///     - storage: The storage.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    public func updateStorage(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool) {
+    ///     - type: The type of the widgets.
+    public func updateStorage<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
         let modified = getModified(modifiers: modifiers)
         if let widget = modified as? Widget {
-            widget.update(storage, modifiers: modifiers, updateProperties: updateProperties)
+            widget.update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
         } else {
             Wrapper { viewContent }
-                .update(storage, modifiers: modifiers, updateProperties: updateProperties)
+                .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
         }
     }
 
     /// Get a storage.
-    /// - Parameter modifiers: Modify views before being updated.
+    /// - Parameters:
+    ///     - modifiers: Modify views before being updated.
+    ///     - type: The widget types.
     /// - Returns: The storage.
-    public func storage(modifiers: [(AnyView) -> AnyView]) -> ViewStorage {
-        widget(modifiers: modifiers).container(modifiers: modifiers)
+    public func storage<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
+        widget(modifiers: modifiers).container(modifiers: modifiers, type: type)
     }
 
     /// Wrap the view into a widget.
@@ -68,6 +71,11 @@ extension AnyView {
             return peer
         }
         return Wrapper { viewContent }
+    }
+
+    /// Whether the view can be rendered in a certain environment.
+    func renderable<WidgetType>(type: WidgetType.Type) -> Bool {
+        self as? WidgetType != nil || self as? SimpleView != nil || self as? View != nil
     }
 
 }

@@ -32,20 +32,21 @@ public struct Wrapper: Widget {
     ///     - storage: The view storage.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    public func update(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool) {
-        if let storage = storage.content[.mainContent]?.first {
-            content
-                .widget(modifiers: modifiers)
-                .update(storage, modifiers: modifiers, updateProperties: updateProperties)
+    ///     - type: The widget types.
+    public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+        guard let storages = storage.content[.mainContent] else {
+            return
         }
+        content.update(storages, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
 
     /// Get a view storage.
-    /// - Parameter modifiers: Modify views before being updated.
+    /// - Parameters:
+    ///     - modifiers: Modify views before being updated.
+    ///     - type: The type of the widgets.
     /// - Returns: The view storage.
-    public func container(modifiers: [(AnyView) -> AnyView]) -> ViewStorage {
-        let content = content.widget(modifiers: modifiers).container(modifiers: modifiers)
-        return .init(content.pointer, content: [.mainContent: [content]])
+    public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
+        ViewStorage(nil, content: [.mainContent: content.map { $0.storage(modifiers: [], type: type) }])
     }
 
 }

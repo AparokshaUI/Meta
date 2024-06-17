@@ -50,7 +50,8 @@ public struct StateWrapper: Widget {
     ///     - storage: The view storage.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    public func update(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool) {
+    ///     - type: The type of the widgets.
+    public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
         var updateProperties = storage.fields[updateID] as? Bool ?? false
         storage.fields[updateID] = false
         for property in state {
@@ -65,15 +66,17 @@ public struct StateWrapper: Widget {
         if let storage = storage.content[.mainContent]?.first {
             content()
                 .widget(modifiers: modifiers)
-                .update(storage, modifiers: modifiers, updateProperties: updateProperties)
+                .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
         }
     }
 
     /// Get a view storage.
-    /// - Parameter modifiers: Modify views before being updated.
+    /// - Parameters:
+    ///     - modifiers: Modify views before being updated.
+    ///     - type: The type of the widgets.
     /// - Returns: The view storage.
-    public func container(modifiers: [(AnyView) -> AnyView]) -> ViewStorage {
-        let content = content().widget(modifiers: modifiers).container(modifiers: modifiers)
+    public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
+        let content = content().storage(modifiers: modifiers, type: type)
         let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state
         observe(storage: storage)

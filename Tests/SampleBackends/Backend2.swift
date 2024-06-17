@@ -2,7 +2,7 @@ import Meta
 
 public enum Backend2 {
 
-    public struct TestWidget: BackendWidget {
+    public struct TestWidget2: BackendWidget {
     
         public init() { }
     
@@ -14,21 +14,20 @@ public enum Backend2 {
             []
         }
     
-        public func container(modifiers: [(AnyView) -> AnyView]) -> ViewStorage {
-            print("Init Content")
+        public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
+            print("Init test widget 2")
             let storage = ViewStorage(nil)
             storage.fields["test"] = 0
             return storage
         }
 
-        public func update(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool) {
-            storage.fields["test"] = storage.fields["tests"] as? Int ?? 0 + 1
+        public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+            print("Update test widget 2 (#\(storage.fields["test"] ?? ""))")
+            storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
         }
     
     }
     
-    public protocol BackendView: AnyView { }
-    
-    public protocol BackendWidget: BackendView, Widget { }
+    public protocol BackendWidget: Widget { }
 
 }

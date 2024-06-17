@@ -13,14 +13,17 @@ public protocol Widget: AnyView {
     /// The debug tree's content.
     var debugTreeContent: [(String, body: Body)] { get }
     /// The view storage.
-    /// - Parameter modifiers: Modify views before being updated.
-    func container(modifiers: [(AnyView) -> AnyView]) -> ViewStorage
+    /// - Parameters:
+    ///     - modifiers: Modify views before being updated.
+    ///     - type: The type of the widgets.
+    func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage
     /// Update the stored content.
     /// - Parameters:
     ///     - storage: The storage to update.
     ///     - modifiers: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
-    func update(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool)
+    ///     - type: The type of the widgets.
+    func update<WidgetType>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type)
 
 }
 
@@ -30,7 +33,7 @@ extension Widget {
     public var viewContent: Body { [] }
 
     /// A description of the view.
-    public func getViewDescription<ViewType>(parameters: Bool, type: ViewType.Type) -> String {
+    public func getViewDescription<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
         var content = ""
         for element in debugTreeContent {
             if content.isEmpty {

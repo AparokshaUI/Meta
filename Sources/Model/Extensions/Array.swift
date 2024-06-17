@@ -15,9 +15,9 @@ extension Array: AnyView where Element == AnyView {
     /// Get the debug tree for an array of views.
     /// - Parameter parameters: Whether the widget parameters should be visible in the tree.
     /// - Returns: The tree.
-    public func getBodyDebugTree<ViewType>(parameters: Bool, type: ViewType.Type) -> String {
+    public func getBodyDebugTree<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
         var description = ""
-        for view in self where view as? ViewType != nil {
+        for view in self where view.renderable(type: type) {
             let viewDescription: String
             if let widget = view as? Widget {
                 viewDescription = widget.getViewDescription(parameters: parameters, type: type)
@@ -45,7 +45,6 @@ extension Array: AnyView where Element == AnyView {
                     modified[safe: index] = modifier(view)
                 }
             }
-            // TODO: Is wrapper correct choice?
             return Wrapper { modified }
         }
     }
@@ -55,12 +54,13 @@ extension Array: AnyView where Element == AnyView {
     ///     - storage: The collection of view storages.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    public func update(_ storage: [ViewStorage], modifiers: [(AnyView) -> AnyView], updateProperties: Bool) {
-        for (index, element) in enumerated() {
+    ///     - type: The type of the widgets.
+    public func update<WidgetType>(_ storage: [ViewStorage], modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: WidgetType.Type) {
+        for (index, element) in enumerated() where element.renderable(type: type) {
             if let storage = storage[safe: index] {
                 element
                     .widget(modifiers: modifiers)
-                    .updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties)
+                    .updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
             }
         }
     }
