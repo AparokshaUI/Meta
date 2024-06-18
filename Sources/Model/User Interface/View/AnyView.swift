@@ -16,15 +16,28 @@ public protocol AnyView {
 extension AnyView {
 
     /// Get the view's debug tree.
-    /// - Parameter parameters: Whether the widget parameters should be included in the debug tree.
+    /// - Parameters:
+    ///     - parameters: Whether the widget parameters should be included in the debug tree.
+    ///     - type: The widget type.
+    ///     - modifiers: Modify the view before getting the debug tree.
     /// - Returns: A textual description.
-    public func getDebugTree<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
-        if let body = self as? Body {
+    public func getDebugTree<WidgetType>(
+        parameters: Bool,
+        type: WidgetType.Type,
+        modifiers: [(AnyView) -> AnyView] = []
+    ) -> String {
+        if let body = getModified(modifiers: modifiers) as? Body {
             return body.getBodyDebugTree(parameters: parameters, type: type)
+        } else if let widget = getModified(modifiers: modifiers) as? Widget {
+            return widget.getViewDescription(parameters: parameters, type: type)
         }
         return """
         \(Self.self) {
-            \(indented: viewContent.getBodyDebugTree(parameters: parameters, type: type))
+            \(indented: viewContent
+                .map { view in
+                    view.getModified(modifiers: modifiers)
+                }
+                .getBodyDebugTree(parameters: parameters, type: type))
         }
         """
     }
@@ -49,13 +62,8 @@ extension AnyView {
         updateProperties: Bool,
         type: WidgetType.Type
     ) {
-        let modified = getModified(modifiers: modifiers)
-        if let widget = modified as? Widget {
-            widget.update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
-        } else {
-            Wrapper { viewContent }
-                .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
-        }
+        widget(modifiers: modifiers)
+            .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
 
     /// Get a storage.
@@ -75,7 +83,7 @@ extension AnyView {
         if let peer = modified as? Widget {
             return peer
         }
-        return Wrapper { viewContent }
+        return Wrapper { viewContent.map { $0.getModified(modifiers: modifiers) } }
     }
 
     /// Whether the view can be rendered in a certain environment.

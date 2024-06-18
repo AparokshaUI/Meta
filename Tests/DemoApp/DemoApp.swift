@@ -12,7 +12,7 @@ struct DemoView: SimpleView {
      @ViewBuilder
      var testContent: Body {
         Backend2.TestWidget2()
-        Backend1.TestWidget1()
+        Backend1.TestWidget3()
      }
 
 }
@@ -25,10 +25,10 @@ struct TestView: SimpleView {
 
 }
 
-print(DemoView().getDebugTree(parameters: true, type: Backend1.BackendWidget.self))
-print(DemoView().getDebugTree(parameters: true, type: Backend2.BackendWidget.self))
+let backendType = Backend1.BackendWidget.self
 
-let storage = DemoView().storage(modifiers: [], type: Backend1.BackendWidget.self)
+print(DemoView().getDebugTree(parameters: true, type: backendType))
+let storage = DemoView().storage(modifiers: [], type: backendType)
 for _ in 0...2 {
-    DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: Backend2.BackendWidget.self)
+    DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
 }

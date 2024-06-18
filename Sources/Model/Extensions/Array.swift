@@ -18,13 +18,7 @@ extension Array: AnyView where Element == AnyView {
     public func getBodyDebugTree<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
         var description = ""
         for view in self where view.renderable(type: type) {
-            let viewDescription: String
-            if let widget = view as? Widget {
-                viewDescription = widget.getViewDescription(parameters: parameters, type: type)
-            } else {
-                viewDescription = view.getDebugTree(parameters: parameters, type: type)
-            }
-            description += viewDescription + "\n"
+            description += view.getDebugTree(parameters: parameters, type: type) + "\n"
         }
         if !description.isEmpty {
             description.removeLast()
@@ -61,7 +55,7 @@ extension Array: AnyView where Element == AnyView {
         updateProperties: Bool,
         type: WidgetType.Type
     ) {
-        for (index, element) in enumerated() where element.renderable(type: type) {
+        for (index, element) in filter({ $0.renderable(type: type) }).enumerated() {
             if let storage = storage[safe: index] {
                 element
                     .widget(modifiers: modifiers)
@@ -70,26 +64,15 @@ extension Array: AnyView where Element == AnyView {
         }
     }
 
-}
-
-extension Array where Element == String {
-
-    /// Get the C version of the array.
-    var cArray: UnsafePointer<UnsafePointer<CChar>?>? {
-        let cStrings = self.map { $0.utf8CString }
-        let cStringPointers = cStrings.map { $0.withUnsafeBufferPointer { $0.baseAddress } }
-        let optionalCStringPointers = cStringPointers + [nil]
-        var optionalCStringPointersCopy = optionalCStringPointers
-        optionalCStringPointersCopy.withUnsafeMutableBufferPointer { bufferPointer in
-            bufferPointer.baseAddress?.advanced(by: cStrings.count).pointee = nil
-        }
-        let flatArray = optionalCStringPointersCopy.compactMap { $0 }
-        let pointer = UnsafeMutablePointer<UnsafePointer<CChar>?>.allocate(capacity: flatArray.count + 1)
-        for (index, element) in flatArray.enumerated() {
-            pointer.advanced(by: index).pointee = element
-        }
-        pointer.advanced(by: flatArray.count).pointee = nil
-        return UnsafePointer(pointer)
+    /// Get the view storages of a collection of views.
+    /// - Parameters:
+    ///     - modifiers: Modify views before generating the storages.
+    ///     - type: The type of the widgets.
+    public func storages<WidgetType>(
+        modifiers: [(AnyView) -> AnyView],
+        type: WidgetType.Type
+    ) -> [ViewStorage] {
+        compactMap { $0.renderable(type: type) ? $0.storage(modifiers: [], type: type) : nil }
     }
 
 }

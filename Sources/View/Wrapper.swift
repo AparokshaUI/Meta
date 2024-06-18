@@ -51,7 +51,7 @@ public struct Wrapper: ConvenienceWidget {
     ///     - type: The type of the widgets.
     /// - Returns: The view storage.
     public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
-        ViewStorage(nil, content: [.mainContent: content.map { $0.storage(modifiers: [], type: type) }])
+        .init(nil, content: [.mainContent: content.storages(modifiers: modifiers, type: type)])
     }
 
 }
