@@ -15,10 +15,14 @@ extension Array: AnyView where Element == AnyView {
     /// Get the debug tree for an array of views.
     /// - Parameter parameters: Whether the widget parameters should be visible in the tree.
     /// - Returns: The tree.
-    public func getBodyDebugTree<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
+    public func getBodyDebugTree<WidgetType>(
+        parameters: Bool,
+        type: WidgetType.Type,
+        modifiers: [(AnyView) -> AnyView] = []
+    ) -> String {
         var description = ""
-        for view in self where view.renderable(type: type) {
-            description += view.getDebugTree(parameters: parameters, type: type) + "\n"
+        for view in self where view.renderable(type: type, modifiers: modifiers) {
+            description += view.getDebugTree(parameters: parameters, type: type, modifiers: modifiers) + "\n"
         }
         if !description.isEmpty {
             description.removeLast()
@@ -55,7 +59,7 @@ extension Array: AnyView where Element == AnyView {
         updateProperties: Bool,
         type: WidgetType.Type
     ) {
-        for (index, element) in filter({ $0.renderable(type: type) }).enumerated() {
+        for (index, element) in filter({ $0.renderable(type: type, modifiers: modifiers) }).enumerated() {
             if let storage = storage[safe: index] {
                 element
                     .widget(modifiers: modifiers)
@@ -72,7 +76,7 @@ extension Array: AnyView where Element == AnyView {
         modifiers: [(AnyView) -> AnyView],
         type: WidgetType.Type
     ) -> [ViewStorage] {
-        compactMap { $0.renderable(type: type) ? $0.storage(modifiers: [], type: type) : nil }
+        compactMap { $0.renderable(type: type, modifiers: modifiers) ? $0.storage(modifiers: [], type: type) : nil }
     }
 
 }

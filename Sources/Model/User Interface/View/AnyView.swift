@@ -27,9 +27,9 @@ extension AnyView {
         modifiers: [(AnyView) -> AnyView] = []
     ) -> String {
         if let body = getModified(modifiers: modifiers) as? Body {
-            return body.getBodyDebugTree(parameters: parameters, type: type)
+            return body.getBodyDebugTree(parameters: parameters, type: type, modifiers: modifiers)
         } else if let widget = getModified(modifiers: modifiers) as? Widget {
-            return widget.getViewDescription(parameters: parameters, type: type)
+            return widget.getViewDescription(parameters: parameters, type: type, modifiers: modifiers)
         }
         return """
         \(Self.self) {
@@ -37,7 +37,7 @@ extension AnyView {
                 .map { view in
                     view.getModified(modifiers: modifiers)
                 }
-                .getBodyDebugTree(parameters: parameters, type: type))
+                .getBodyDebugTree(parameters: parameters, type: type, modifiers: modifiers))
         }
         """
     }
@@ -87,11 +87,13 @@ extension AnyView {
     }
 
     /// Whether the view can be rendered in a certain environment.
-    func renderable<WidgetType>(type: WidgetType.Type) -> Bool {
-        self as? WidgetType != nil
-        || self as? SimpleView != nil
-        || self as? View != nil
-        || self as? ConvenienceWidget != nil
+    func renderable<WidgetType>(type: WidgetType.Type, modifiers: [(AnyView) -> AnyView]) -> Bool {
+        let result = getModified(modifiers: modifiers)
+        return result as? WidgetType != nil
+        || result as? SimpleView != nil
+        || result as? View != nil
+        || result as? ConvenienceWidget != nil
+        || result as? Body != nil
     }
 
 }

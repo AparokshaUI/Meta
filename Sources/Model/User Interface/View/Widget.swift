@@ -38,19 +38,23 @@ extension Widget {
     public var viewContent: Body { [] }
 
     /// A description of the view.
-    public func getViewDescription<WidgetType>(parameters: Bool, type: WidgetType.Type) -> String {
+    public func getViewDescription<WidgetType>(
+        parameters: Bool,
+        type: WidgetType.Type,
+        modifiers: [(AnyView) -> AnyView]
+    ) -> String {
         var content = ""
         for element in debugTreeContent {
             if content.isEmpty {
                 content += """
                  {
-                    \(indented: element.body.getDebugTree(parameters: parameters, type: type))
+                    \(indented: element.body.getDebugTree(parameters: parameters, type: type, modifiers: modifiers))
                 }
                 """
             } else {
                 content += """
                  \(element.0): {
-                    \(indented: element.body.getDebugTree(parameters: parameters, type: type))
+                    \(indented: element.body.getDebugTree(parameters: parameters, type: type, modifiers: modifiers))
                 }
                 """
             }
