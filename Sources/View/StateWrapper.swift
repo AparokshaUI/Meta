@@ -18,7 +18,7 @@ public struct StateWrapper: ConvenienceWidget {
     /// The debug tree parameters.
     public var debugTreeParameters: [(String, value: CustomStringConvertible)] {
         [
-            ("state", value: state)
+            ("state", value: state.map { $0.key.dropFirst() }.joined(separator: ", "))
         ]
     }
 

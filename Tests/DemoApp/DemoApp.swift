@@ -1,12 +1,15 @@
 import Meta
 import SampleBackends
 
-struct DemoView: SimpleView {
+struct DemoView: View {
+
+    @State private var test = ""
 
      var view: Body {
         Wrapper {
             Backend1.TestWidget1()
-            Backend1.Button("") {
+            Backend1.Button(test) {
+                test = "\(Int.random(in: 0...10))"
             }
             TestView()
             testContent
