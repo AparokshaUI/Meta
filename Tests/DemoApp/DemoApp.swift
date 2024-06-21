@@ -1,19 +1,18 @@
+import Foundation
 import Meta
 import SampleBackends
 
 struct DemoView: View {
 
-    @State private var test = ""
+    @State private var test = "Label"
 
      var view: Body {
-        Wrapper {
-            Backend1.TestWidget1()
-            Backend1.Button(test) {
-                test = "\(Int.random(in: 0...10))"
-            }
-            TestView()
-            testContent
+        Backend1.TestWidget1()
+        Backend1.Button(test) {
+            test = "\(Int.random(in: 1...10))"
         }
+        TestView()
+        testContent
      }
 
      @ViewBuilder
@@ -43,3 +42,10 @@ for round in 0...2 {
     print("#\(round)")
     DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
 }
+
+UpdateManager.addUpdateHandler { _ in
+    print("#Handler")
+    DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: false, type: backendType)
+}
+
+sleep(2)

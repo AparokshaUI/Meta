@@ -27,7 +27,7 @@ public enum UpdateManager {
 
     /// Add a handler that is called when the user interface should update.
     /// - Parameter handler: The handler. The parameter defines whether the whole UI should be force updated.
-    static func addUpdateHandler(handler: @escaping (Bool) -> Void) {
+    public static func addUpdateHandler(handler: @escaping (Bool) -> Void) {
         updateHandlers.append(handler)
     }
 

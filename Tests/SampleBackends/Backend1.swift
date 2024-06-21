@@ -56,7 +56,12 @@ public enum Backend1 {
 
     public struct Button: BackendWidget {
 
+        var label: String
+        var action: () -> Void
+
         public init(_ label: String, action: @escaping () -> Void) {
+            self.label = label
+            self.action = action
         }
 
         public var debugTreeContent: [(String, body: Body)] {
@@ -64,14 +69,24 @@ public enum Backend1 {
         }
 
         public var debugTreeParameters: [(String, value: any CustomStringConvertible)] {
-            []
+            _ = action
+            return [("label", value: label), ("action", value: "() -> Void")]
         }
 
         public func container<WidgetType>(modifiers: [(any AnyView) -> any AnyView], type: WidgetType.Type) -> ViewStorage {
-            .init(nil)
+            Task {
+                try await Task.sleep(for: .seconds(1))
+                action()
+            }
+            return .init(nil)
         }
 
         public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: WidgetType.Type) {
+            if updateProperties {
+                print("Update button")
+            } else {
+                print("Do not update button")
+            }
         }
 
     }
