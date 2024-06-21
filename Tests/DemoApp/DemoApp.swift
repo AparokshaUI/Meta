@@ -4,9 +4,13 @@ import SampleBackends
 struct DemoView: SimpleView {
 
      var view: Body {
-        Backend1.TestWidget1()
-        TestView()
-        testContent
+        Wrapper {
+            Backend1.TestWidget1()
+            Backend1.Button("") {
+            }
+            TestView()
+            testContent
+        }
      }
 
      @ViewBuilder
@@ -20,7 +24,7 @@ struct DemoView: SimpleView {
 struct TestView: SimpleView {
 
     var view: Body {
-        []
+        Backend2.TestWidget4()
     }
 
 }

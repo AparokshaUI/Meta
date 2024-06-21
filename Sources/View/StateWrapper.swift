@@ -11,7 +11,7 @@ import Observation
 public struct StateWrapper: ConvenienceWidget {
 
     /// The content.
-    var content: () -> Body
+    var content: Body
     /// The state information (from properties with the `State` wrapper).
     var state: [String: StateProtocol] = [:]
 
@@ -24,7 +24,7 @@ public struct StateWrapper: ConvenienceWidget {
 
     /// The debug tree's content.
     public var debugTreeContent: [(String, body: Body)] {
-        [("content", body: content())]
+        [("content", body: content)]
     }
 
     /// The identifier of the field storing whether to update the wrapper's content.
@@ -33,7 +33,7 @@ public struct StateWrapper: ConvenienceWidget {
     /// Initialize a `StateWrapper`.
     /// - Parameter content: The view content.
     public init(@ViewBuilder content: @escaping () -> Body) {
-        self.content = content
+        self.content = content()
     }
 
     /// Initialize a `StateWrapper`.
@@ -41,7 +41,7 @@ public struct StateWrapper: ConvenienceWidget {
     ///   - content: The view content.
     ///   - state: The state information.
     init(content: @escaping () -> Body, state: [String: StateProtocol]) {
-        self.content = content
+        self.content = content()
         self.state = state
     }
 
@@ -68,11 +68,10 @@ public struct StateWrapper: ConvenienceWidget {
                 property.value.content.storage.update = false
             }
         }
-        if let storage = storage.content[.mainContent]?.first {
-            content()
-                .widget(modifiers: modifiers)
-                .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
+        guard let storages = storage.content[.mainContent] else {
+            return
         }
+        content.update(storages, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
 
     /// Get a view storage.
@@ -81,8 +80,8 @@ public struct StateWrapper: ConvenienceWidget {
     ///     - type: The type of the widgets.
     /// - Returns: The view storage.
     public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
-        let content = content().storage(modifiers: modifiers, type: type)
-        let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
+        let content = content.storages(modifiers: modifiers, type: type)
+        let storage = ViewStorage(nil, content: [.mainContent: content])
         storage.state = state
         observe(storage: storage)
         return storage
@@ -92,7 +91,7 @@ public struct StateWrapper: ConvenienceWidget {
     /// - Parameter storage: The view storage
     func observe(storage: ViewStorage) {
         withObservationTracking {
-            _ = content().getDebugTree(parameters: true, type: AnyView.self)
+            _ = content.getDebugTree(parameters: true, type: AnyView.self)
         } onChange: {
             storage.fields[updateID] = true
             UpdateManager.updateViews()

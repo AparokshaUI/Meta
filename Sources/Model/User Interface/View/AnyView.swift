@@ -83,6 +83,9 @@ extension AnyView {
         if let peer = modified as? Widget {
             return peer
         }
+        if let array = modified as? Body {
+            return Wrapper { array }
+        }
         return Wrapper { viewContent.map { $0.getModified(modifiers: modifiers) } }
     }
 

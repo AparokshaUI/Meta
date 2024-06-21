@@ -76,7 +76,9 @@ extension Array: AnyView where Element == AnyView {
         modifiers: [(AnyView) -> AnyView],
         type: WidgetType.Type
     ) -> [ViewStorage] {
-        compactMap { $0.renderable(type: type, modifiers: modifiers) ? $0.storage(modifiers: [], type: type) : nil }
+        compactMap { view in
+            view.renderable(type: type, modifiers: modifiers) ? view.storage(modifiers: modifiers, type: type) : nil
+        }
     }
 
 }

@@ -54,6 +54,28 @@ public enum Backend1 {
 
     }
 
+    public struct Button: BackendWidget {
+
+        public init(_ label: String, action: @escaping () -> Void) {
+        }
+
+        public var debugTreeContent: [(String, body: Body)] {
+            []
+        }
+
+        public var debugTreeParameters: [(String, value: any CustomStringConvertible)] {
+            []
+        }
+
+        public func container<WidgetType>(modifiers: [(any AnyView) -> any AnyView], type: WidgetType.Type) -> ViewStorage {
+            .init(nil)
+        }
+
+        public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: WidgetType.Type) {
+        }
+
+    }
+
     public protocol BackendWidget: Widget { }
 
 }
