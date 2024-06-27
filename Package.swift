@@ -1,4 +1,4 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.10
 //
 //  Package.swift
 //  Meta
@@ -11,6 +11,10 @@ import PackageDescription
 /// The Meta package is the foundation of the Aparoksha project.
 let package = Package(
     name: "Meta",
+    platforms: [
+        .macOS(.v10_15),
+        .iOS(.v13)
+    ],
     products: [
         .library(
             name: "Meta",

@@ -26,12 +26,17 @@ extension AnyView {
         type: WidgetType.Type,
         modifiers: [(AnyView) -> AnyView] = []
     ) -> String {
+        let oldValue = StateManager.saveState
+        StateManager.saveState = false
+        defer {
+            StateManager.saveState = oldValue
+        }
         if let body = getModified(modifiers: modifiers) as? Body {
             return body.getBodyDebugTree(parameters: parameters, type: type, modifiers: modifiers)
         } else if let widget = getModified(modifiers: modifiers) as? Widget {
             return widget.getViewDescription(parameters: parameters, type: type, modifiers: modifiers)
         }
-        return """
+        let string = """
         \(Self.self) {
             \(indented: viewContent
                 .map { view in
@@ -40,6 +45,7 @@ extension AnyView {
                 .getBodyDebugTree(parameters: parameters, type: type, modifiers: modifiers))
         }
         """
+        return string
     }
 
     func getModified(modifiers: [(AnyView) -> AnyView]) -> AnyView {

@@ -20,6 +20,8 @@ extension Array: AnyView where Element == AnyView {
         type: WidgetType.Type,
         modifiers: [(AnyView) -> AnyView] = []
     ) -> String {
+        let oldValue = StateManager.saveState
+        StateManager.saveState = false
         var description = ""
         for view in self where view.renderable(type: type, modifiers: modifiers) {
             description += view.getDebugTree(parameters: parameters, type: type, modifiers: modifiers) + "\n"
@@ -27,6 +29,7 @@ extension Array: AnyView where Element == AnyView {
         if !description.isEmpty {
             description.removeLast()
         }
+        StateManager.saveState = oldValue
         return description
     }
 

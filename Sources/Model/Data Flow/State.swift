@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Observation
 
 /// A property wrapper for properties in a view that should be stored throughout view updates.
 @propertyWrapper
@@ -18,8 +19,8 @@ public struct State<Value>: StateProtocol {
         }
         nonmutating set {
             rawValue = newValue
-            content.storage.update = true
-            UpdateManager.updateViews(force: forceUpdates)
+            StateManager.updateState(id: id)
+            StateManager.updateViews(force: forceUpdates)
         }
     }
 
@@ -32,46 +33,45 @@ public struct State<Value>: StateProtocol {
         }
     }
 
-    // swiftlint:disable force_cast
     /// Get and set the value without updating the views.
     public var rawValue: Value {
         get {
-            content.storage.value as! Value
+            guard let value = StateManager.getState(id: id) as? Value else {
+                let initialValue = getInitialValue()
+                StateManager.setState(id: id, value: initialValue)
+                return initialValue
+            }
+            return value
         }
         nonmutating set {
-            content.storage.value = newValue
-            writeValue?(newValue)
+            StateManager.setState(id: id, value: newValue)
         }
     }
-    // swiftlint:enable force_cast
 
-    /// The stored value.
-    let content: StateContent
+    /// Whether the value is an observable object.
+    var isObservable: Bool {
+        if #available(macOS 14, *), #available(iOS 17, *) {
+            return Value.self as? Observable.Type != nil
+        } else {
+            return false
+        }
+    }
+
+    /// The state's identifier for the stored value.
+    var id: UUID = .init()
 
     /// Whether to force update the views when the value changes.
-    public var forceUpdates: Bool
+    var forceUpdates: Bool
 
-    /// The function for updating the value in the settings file.
-    private var writeValue: ((Value) -> Void)?
-
-    /// The value with an erased type.
-    public var value: Any {
-        get {
-            wrappedValue
-        }
-        nonmutating set {
-            if let newValue = newValue as? Value {
-                content.storage.value = newValue
-            }
-        }
-    }
+    /// The closure for initializing the state property's value.
+    var getInitialValue: () -> Value
 
     /// Initialize a property representing a state in the view with an autoclosure.
     /// - Parameters:
     ///     - wrappedValue: The wrapped value.
     ///     - forceUpdates: Whether to force update all available views when the property gets modified.
     public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
-        content = .init(getInitialValue: wrappedValue)
+        getInitialValue = wrappedValue
         self.forceUpdates = forceUpdates
     }
 

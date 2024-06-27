@@ -1,15 +1,18 @@
 import Foundation
 import Meta
+import Observation
 import SampleBackends
 
+@available(macOS 14, *)
+@available(iOS 17, *)
 struct DemoView: View {
 
-    @State private var test = "Label"
+    @State private var test = TestModel()
 
-     var view: Body {
+    var view: Body {
         Backend1.TestWidget1()
-        Backend1.Button(test) {
-            test = "\(Int.random(in: 1...10))"
+        Backend1.Button(test.test) {
+            test.test = "\(Int.random(in: 1...10))"
         }
         TestView()
         testContent
@@ -23,29 +26,55 @@ struct DemoView: View {
 
 }
 
-struct TestView: SimpleView {
+struct TestView: View {
+
+    @State private var test = "Label"
 
     var view: Body {
         Backend2.TestWidget4()
+        Backend1.Button(test) {
+            Task {
+                try await Task.sleep(nanoseconds: 100_000_000)
+                test = "\(Int.random(in: 1...10))"
+            }
+        }
     }
 
 }
 
-let backendType = Backend1.BackendWidget.self
-let modifiers: [(AnyView) -> AnyView] = [
-    { $0 as? Backend2.TestWidget2 != nil ? [Backend1.TestWidget1()] : $0 }
-]
+@available(macOS 14, *)
+@available(iOS 17, *)
+@Observable
+class TestModel {
 
-print(DemoView().getDebugTree(parameters: true, type: backendType, modifiers: modifiers))
-let storage = DemoView().storage(modifiers: modifiers, type: backendType)
-for round in 0...2 {
-    print("#\(round)")
-    DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
+    var test = "Label"
+
 }
 
-UpdateManager.addUpdateHandler { _ in
-    print("#Handler")
-    DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: false, type: backendType)
-}
+@main
+@available(macOS 14, *)
+@available(iOS 17, *)
+struct DemoApp {
 
-sleep(2)
+    static func main() {
+        let backendType = Backend1.BackendWidget.self
+        let modifiers: [(AnyView) -> AnyView] = [
+            { $0 as? Backend2.TestWidget2 != nil ? [Backend1.TestWidget1()] : $0 }
+        ]
+
+        print(DemoView().getDebugTree(parameters: true, type: backendType, modifiers: modifiers))
+        let storage = DemoView().storage(modifiers: modifiers, type: backendType)
+        for round in 0...2 {
+            print("#\(round)")
+            DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
+        }
+
+        StateManager.addUpdateHandler { _ in
+            DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: false, type: backendType)
+        }
+
+        sleep(2)
+        DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
+    }
+
+}

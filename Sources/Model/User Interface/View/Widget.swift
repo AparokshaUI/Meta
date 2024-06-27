@@ -43,6 +43,11 @@ extension Widget {
         type: WidgetType.Type,
         modifiers: [(AnyView) -> AnyView]
     ) -> String {
+        let oldValue = StateManager.saveState
+        StateManager.saveState = false
+        defer {
+            StateManager.saveState = oldValue
+        }
         var content = ""
         for element in debugTreeContent {
             if content.isEmpty {

@@ -74,8 +74,9 @@ public enum Backend1 {
         }
 
         public func container<WidgetType>(modifiers: [(any AnyView) -> any AnyView], type: WidgetType.Type) -> ViewStorage {
+            print("Init button")
             Task {
-                try await Task.sleep(for: .seconds(1))
+                try await Task.sleep(nanoseconds: 1_000_000_000)
                 action()
             }
             return .init(nil)
@@ -83,9 +84,9 @@ public enum Backend1 {
 
         public func update<WidgetType>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: WidgetType.Type) {
             if updateProperties {
-                print("Update button")
+                print("Update button (label = \(label))")
             } else {
-                print("Do not update button")
+                print("Do not update button (label = \(label))")
             }
         }
 
