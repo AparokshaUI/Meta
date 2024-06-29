@@ -58,23 +58,20 @@ struct DemoApp {
 
     static func main() {
         let backendType = Backend1.BackendWidget.self
-        let modifiers: [(AnyView) -> AnyView] = [
-            { $0 as? Backend2.TestWidget2 != nil ? [Backend1.TestWidget1()] : $0 }
-        ]
 
-        print(DemoView().getDebugTree(parameters: true, type: backendType, modifiers: modifiers))
-        let storage = DemoView().storage(modifiers: modifiers, type: backendType)
+        print(DemoView().getDebugTree(parameters: true, type: backendType, modifiers: []))
+        let storage = DemoView().storage(modifiers: [], type: backendType)
         for round in 0...2 {
             print("#\(round)")
-            DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
+            DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
         }
 
         StateManager.addUpdateHandler { _ in
-            DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: false, type: backendType)
+            DemoView().updateStorage(storage, modifiers: [], updateProperties: false, type: backendType)
         }
 
         sleep(2)
-        DemoView().updateStorage(storage, modifiers: modifiers, updateProperties: true, type: backendType)
+        DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
     }
 
 }
