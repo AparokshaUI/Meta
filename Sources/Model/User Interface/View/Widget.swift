@@ -8,10 +8,6 @@
 /// A widget is a view that know about its GTUI widget.
 public protocol Widget: AnyView {
 
-    /// The debug tree parameters.
-    var debugTreeParameters: [(String, value: CustomStringConvertible)] { get }
-    /// The debug tree's content.
-    var debugTreeContent: [(String, body: Body)] { get }
     /// The view storage.
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
@@ -36,39 +32,5 @@ extension Widget {
 
     /// A widget's view is empty.
     public var viewContent: Body { [] }
-
-    /// A description of the view.
-    public func getViewDescription<WidgetType>(
-        parameters: Bool,
-        type: WidgetType.Type,
-        modifiers: [(AnyView) -> AnyView]
-    ) -> String {
-        let oldValue = StateManager.saveState
-        StateManager.saveState = false
-        defer {
-            StateManager.saveState = oldValue
-        }
-        var content = ""
-        for element in debugTreeContent {
-            if content.isEmpty {
-                content += """
-                 {
-                    \(indented: element.body.getDebugTree(parameters: parameters, type: type, modifiers: modifiers))
-                }
-                """
-            } else {
-                content += """
-                 \(element.0): {
-                    \(indented: element.body.getDebugTree(parameters: parameters, type: type, modifiers: modifiers))
-                }
-                """
-            }
-        }
-        if parameters {
-            let parametersString = debugTreeParameters.map { "\($0.0): \($0.value)" }.joined(separator: ", ")
-            return "\(Self.self)(\(parametersString))\(content)"
-        }
-        return "\(Self.self)\(content)"
-    }
 
 }

@@ -11,16 +11,6 @@ public struct Wrapper: ConvenienceWidget {
     /// The content.
     var content: Body
 
-    /// The debug tree parameters.
-    public var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-        []
-    }
-
-    /// The debug tree's content.
-    public var debugTreeContent: [(String, body: Body)] {
-        [("content", body: content)]
-    }
-
     /// Initialize a `Wrapper`.
     /// - Parameter content: The view content.
     public init(@ViewBuilder content: @escaping () -> Body) {

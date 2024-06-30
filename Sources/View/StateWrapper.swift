@@ -15,18 +15,6 @@ public struct StateWrapper: ConvenienceWidget {
     /// The state information (from properties with the `State` wrapper).
     var state: [String: StateProtocol] = [:]
 
-    /// The debug tree parameters.
-    public var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-        [
-            ("state", value: state.map { $0.key.dropFirst() }.joined(separator: ", "))
-        ]
-    }
-
-    /// The debug tree's content.
-    public var debugTreeContent: [(String, body: Body)] {
-        [("content", body: content())]
-    }
-
     /// The identifier of the field storing whether to update the wrapper's content.
     private var updateID: String { "update" }
 
@@ -96,7 +84,7 @@ public struct StateWrapper: ConvenienceWidget {
     @available(iOS, introduced: 17)
     func observe(storage: ViewStorage) {
         withObservationTracking {
-            _ = content().getDebugTree(parameters: true, type: AnyView.self)
+            _ = content()
         } onChange: {
             Task {
                 StateManager.updateState(id: storage.state.first?.value.id ?? .init())

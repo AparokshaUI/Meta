@@ -12,27 +12,6 @@ extension Array: AnyView where Element == AnyView {
     /// The array's view body is the array itself.
     public var viewContent: Body { self }
 
-    /// Get the debug tree for an array of views.
-    /// - Parameter parameters: Whether the widget parameters should be visible in the tree.
-    /// - Returns: The tree.
-    public func getBodyDebugTree<WidgetType>(
-        parameters: Bool,
-        type: WidgetType.Type,
-        modifiers: [(AnyView) -> AnyView] = []
-    ) -> String {
-        let oldValue = StateManager.saveState
-        StateManager.saveState = false
-        var description = ""
-        for view in self where view.renderable(type: type, modifiers: modifiers) {
-            description += view.getDebugTree(parameters: parameters, type: type, modifiers: modifiers) + "\n"
-        }
-        if !description.isEmpty {
-            description.removeLast()
-        }
-        StateManager.saveState = oldValue
-        return description
-    }
-
     /// Get a widget from a collection of views.
     /// - Parameter modifiers: Modify views before being updated.
     /// - Returns: A widget.

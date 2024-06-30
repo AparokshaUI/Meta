@@ -13,16 +13,6 @@ struct ContentModifier<Content>: ConvenienceWidget where Content: AnyView {
     /// The closure for the modification.
     var modify: (Content) -> AnyView
 
-    /// The debug tree parameters.
-    var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-        [("modify", value: "(Content) -> AnyView")]
-    }
-
-    /// The debug tree's content.
-    var debugTreeContent: [(String, body: Body)] {
-        [("content", body: [content])]
-    }
-
     /// The view storage.
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.

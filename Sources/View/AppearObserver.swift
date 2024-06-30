@@ -13,18 +13,6 @@ struct AppearObserver: ConvenienceWidget {
     /// The wrapped view.
     var content: AnyView
 
-    /// The debug tree parameters.
-    var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-        [
-            ("modify", value: "(ViewStorage) -> Void")
-        ]
-    }
-
-    /// The debug tree's content.
-    var debugTreeContent: [(String, body: Body)] {
-        [("content", body: [content])]
-    }
-
     /// The view storage.
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.

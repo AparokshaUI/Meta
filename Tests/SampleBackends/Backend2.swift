@@ -6,14 +6,6 @@ public enum Backend2 {
     
         public init() { }
     
-        public var debugTreeContent: [(String, body: Body)] {
-            []
-        }
-        
-        public var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-            []
-        }
-    
         public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
             print("Init test widget 2")
             let storage = ViewStorage(nil)
@@ -31,14 +23,6 @@ public enum Backend2 {
     public struct TestWidget4: BackendWidget {
 
         public init() { }
-
-        public var debugTreeContent: [(String, body: Body)] {
-            []
-        }
-
-        public var debugTreeParameters: [(String, value: CustomStringConvertible)] {
-            []
-        }
 
         public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
             print("Init test widget 4")

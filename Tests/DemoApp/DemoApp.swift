@@ -59,7 +59,6 @@ struct DemoApp {
     static func main() {
         let backendType = Backend1.BackendWidget.self
 
-        print(DemoView().getDebugTree(parameters: true, type: backendType, modifiers: []))
         let storage = DemoView().storage(modifiers: [], type: backendType)
         for round in 0...2 {
             print("#\(round)")
