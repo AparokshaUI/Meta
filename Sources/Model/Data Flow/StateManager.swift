@@ -23,11 +23,25 @@ public enum StateManager {
     struct State {
 
         /// The state's identifiers.
-        var ids: [UUID]
+        var ids: (first: UUID, second: UUID?)
         /// The state value.
         var value: Any?
         /// Whether to update in the next iteration.
         var update = false
+
+        /// Whether the state's identifiers contain a certain identifier.
+        /// - Parameter id: The identifier.
+        /// - Returns: Whether the id is contained.
+        func contains(id: UUID) -> Bool {
+            ids.first == id || ids.second == id
+        }
+        
+        /// Change the identifier to a new one.
+        /// - Parameter newID: The new identifier.
+        mutating func changeID(new newID: UUID) {
+            ids.second = ids.first
+            ids.first = newID
+        }
 
     }
 
@@ -55,8 +69,8 @@ public enum StateManager {
     ///   - value: The new value.
     static func setState(id: UUID, value: Any?) {
         if saveState {
-            guard let index = state.firstIndex(where: { $0.ids.contains(id) }) else {
-                state.append(.init(ids: [id], value: value))
+            guard let index = state.firstIndex(where: { $0.contains(id: id) }) else {
+                state.append(.init(ids: (first: id, second: nil), value: value))
                 return
             }
             state[safe: index]?.value = value
@@ -67,14 +81,14 @@ public enum StateManager {
     /// - Parameter id: The identifier.
     /// - Returns: The value.
     static func getState(id: UUID) -> Any? {
-        state[safe: state.firstIndex { $0.ids.contains(id) }]?.value
+        state[safe: state.firstIndex { $0.contains(id: id) }]?.value
     }
 
     /// Mark the state of a certain id as updated.
     /// - Parameter id: The identifier.
     static func updateState(id: UUID) {
         if saveState {
-            state[safe: state.firstIndex { $0.ids.contains(id) }]?.update = true
+            state[safe: state.firstIndex { $0.contains(id: id) }]?.update = true
         }
     }
 
@@ -82,7 +96,7 @@ public enum StateManager {
     /// - Parameter id: The identifier.
     static func updatedState(id: UUID) {
         if saveState {
-            state[safe: state.firstIndex { $0.ids.contains(id) }]?.update = false
+            state[safe: state.firstIndex { $0.contains(id: id) }]?.update = false
         }
     }
 
@@ -90,7 +104,7 @@ public enum StateManager {
     /// - Parameter id: The identifier.
     /// - Returns: Whether to update the state.
     static func getUpdateState(id: UUID) -> Bool {
-        state[safe: state.firstIndex { $0.ids.contains(id) }]?.update ?? false
+        state[safe: state.firstIndex { $0.contains(id: id) }]?.update ?? false
     }
 
     /// Change the identifier for a certain state value.
@@ -99,7 +113,7 @@ public enum StateManager {
     ///   - newID: The new identifier.
     static func changeID(old oldID: UUID, new newID: UUID) {
         if saveState {
-            state[safe: state.firstIndex { $0.ids.contains(oldID) }]?.ids.append(newID)
+            state[safe: state.firstIndex { $0.contains(id: oldID) }]?.changeID(new: newID)
         }
     }
 

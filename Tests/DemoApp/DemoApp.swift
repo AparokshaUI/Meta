@@ -7,12 +7,12 @@ import SampleBackends
 @available(iOS 17, *)
 struct DemoView: View {
 
-    @State private var test = TestModel()
+    @State private var model = TestModel()
 
     var view: Body {
         Backend1.TestWidget1()
-        Backend1.Button(test.test) {
-            test.test = "\(Int.random(in: 1...10))"
+        Backend1.Button(model.test) {
+            model.test = "\(Int.random(in: 1...10))"
         }
         TestView()
         testContent
@@ -66,6 +66,7 @@ struct DemoApp {
         }
 
         StateManager.addUpdateHandler { force in
+            print("#*")
             DemoView().updateStorage(storage, modifiers: [], updateProperties: force, type: backendType)
         }
 
