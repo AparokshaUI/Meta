@@ -7,7 +7,7 @@
 
 extension String {
 
-    /// A label for main content in a view storage.
-    static var mainContent: Self { "main" }
+    /// An identifier for main content in a view storage.
+    public static var mainContent: Self { "main" }
 
 }

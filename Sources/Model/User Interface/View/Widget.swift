@@ -5,7 +5,10 @@
 //  Created by david-swift on 26.05.24.
 //
 
-/// A widget is a view that know about its GTUI widget.
+/// A widget is a view that know about its native backend widget.
+///
+/// It enables the translation from the declarative definition to the creation 
+/// and updating of widgets in an imperative way.
 public protocol Widget: AnyView {
 
     /// The view storage.

@@ -71,7 +71,7 @@ public struct Binding<Value> {
     private var handlers: [(Value) -> Void] = []
 
     /// Get a property of any content of a `Binding` as a `Binding`.
-    /// - Parameter dynamicMember: The path to the member.
+    /// - Parameter keyPath: The path to the member.
     /// - Returns: The binding.
     public subscript<Subject>(dynamicMember keyPath: WritableKeyPath<Value, Subject>) -> Binding<Subject> {
         .init {

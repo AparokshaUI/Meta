@@ -8,19 +8,16 @@
 import Observation
 
 /// A storage for `@State` properties.
-public struct StateWrapper: ConvenienceWidget {
+struct StateWrapper: ConvenienceWidget {
 
     /// The content.
     var content: () -> Body
     /// The state information (from properties with the `State` wrapper).
     var state: [String: StateProtocol] = [:]
 
-    /// The identifier of the field storing whether to update the wrapper's content.
-    private var updateID: String { "update" }
-
     /// Initialize a `StateWrapper`.
     /// - Parameter content: The view content.
-    public init(@ViewBuilder content: @escaping () -> Body) {
+    init(@ViewBuilder content: @escaping () -> Body) {
         self.content = content
     }
 
@@ -39,14 +36,13 @@ public struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the widgets.
-    public func update<WidgetType>(
+    func update<WidgetType>(
         _ storage: ViewStorage,
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
         type: WidgetType.Type
     ) {
-        var updateProperties = updateProperties ? true : (storage.fields[updateID] as? Bool ?? false)
-        storage.fields[updateID] = false
+        var updateProperties = updateProperties
         for property in state {
             if let oldID = storage.state[property.key]?.id {
                 StateManager.changeID(old: oldID, new: property.value.id)
@@ -68,7 +64,7 @@ public struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the widgets.
     /// - Returns: The view storage.
-    public func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
+    func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
         let content = content().storages(modifiers: modifiers, type: type)
         let storage = ViewStorage(nil, content: [.mainContent: content])
         storage.state = state

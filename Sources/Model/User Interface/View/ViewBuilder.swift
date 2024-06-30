@@ -11,7 +11,7 @@ import Foundation
 @resultBuilder
 public enum ViewBuilder {
 
-    /// A component used in the ``ArrayBuilder``.
+    /// A component used in the ``ViewBuilder``.
     public enum Component {
 
         /// A view as a component.

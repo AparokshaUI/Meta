@@ -51,7 +51,7 @@ extension AnyView {
     /// Wrap the view into a widget.
     /// - Parameter modifiers: Modify views before being updated.
     /// - Returns: The widget.
-    public func widget(modifiers: [(AnyView) -> AnyView]) -> Widget {
+    func widget(modifiers: [(AnyView) -> AnyView]) -> Widget {
         let modified = getModified(modifiers: modifiers)
         if let peer = modified as? Widget {
             return peer

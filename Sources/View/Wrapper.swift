@@ -5,7 +5,7 @@
 //  Created by david-swift on 27.05.24.
 //
 
-/// Wrap a view into a single widget.
+/// Wrap a body into a single widget.
 public struct Wrapper: ConvenienceWidget {
 
     /// The content.

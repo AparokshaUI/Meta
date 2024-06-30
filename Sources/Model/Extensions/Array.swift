@@ -54,6 +54,7 @@ extension Array: AnyView where Element == AnyView {
     /// - Parameters:
     ///     - modifiers: Modify views before generating the storages.
     ///     - type: The type of the widgets.
+    /// - Returns: The storages.
     public func storages<WidgetType>(
         modifiers: [(AnyView) -> AnyView],
         type: WidgetType.Type

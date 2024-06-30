@@ -65,12 +65,11 @@ struct DemoApp {
             DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
         }
 
-        StateManager.addUpdateHandler { _ in
-            DemoView().updateStorage(storage, modifiers: [], updateProperties: false, type: backendType)
+        StateManager.addUpdateHandler { force in
+            DemoView().updateStorage(storage, modifiers: [], updateProperties: force, type: backendType)
         }
 
         sleep(2)
-        DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
     }
 
 }
