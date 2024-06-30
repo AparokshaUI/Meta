@@ -57,7 +57,7 @@ public struct StateWrapper: ConvenienceWidget {
         updateProperties: Bool,
         type: WidgetType.Type
     ) {
-        var updateProperties = storage.fields[updateID] as? Bool ?? false
+        var updateProperties = updateProperties ? true : (storage.fields[updateID] as? Bool ?? false)
         storage.fields[updateID] = false
         for property in state {
             if let oldID = storage.state[property.key]?.id {
