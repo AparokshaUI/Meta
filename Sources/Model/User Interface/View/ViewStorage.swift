@@ -11,7 +11,6 @@ public class ViewStorage {
     /// The pointer.
     ///
     /// It can be a C pointer, a Swift class, or other information depending on the backend.
-    /// Some convenience widgets do not need a pointer to a native framework at all.
     public var pointer: Any?
     /// The view's content for container widgets.
     public var content: [String: [ViewStorage]]

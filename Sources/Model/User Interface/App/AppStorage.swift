@@ -12,6 +12,8 @@ public protocol AppStorage: AnyObject {
     associatedtype SceneElementType
     /// The type of widget elements (which should be backend-specific).
     associatedtype WidgetType
+    /// The wrapper widget.
+    associatedtype WrapperType: Wrapper
 
     /// The scene.
     var app: () -> any App { get }

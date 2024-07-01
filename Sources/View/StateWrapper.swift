@@ -35,13 +35,13 @@ struct StateWrapper: ConvenienceWidget {
     ///     - storage: The view storage.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    ///     - type: The type of the widgets.
-    func update<WidgetType>(
+    ///     - type: The type of the app storage.
+    func update<Storage>(
         _ storage: ViewStorage,
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
-        type: WidgetType.Type
-    ) {
+        type: Storage.Type
+    ) where Storage: AppStorage {
         var updateProperties = updateProperties
         for property in state {
             if let oldID = storage.state[property.key]?.id {
@@ -53,20 +53,23 @@ struct StateWrapper: ConvenienceWidget {
                 StateManager.updatedState(id: property.value.id)
             }
         }
-        guard let storages = storage.content[.mainContent] else {
+        guard let storage = storage.content[.mainContent]?.first else {
             return
         }
-        content().update(storages, modifiers: modifiers, updateProperties: updateProperties, type: type)
+        content().updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
 
     /// Get a view storage.
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
-    ///     - type: The type of the widgets.
+    ///     - type: The type of the app storage.
     /// - Returns: The view storage.
-    func container<WidgetType>(modifiers: [(AnyView) -> AnyView], type: WidgetType.Type) -> ViewStorage {
-        let content = content().storages(modifiers: modifiers, type: type)
-        let storage = ViewStorage(nil, content: [.mainContent: content])
+    func container<Storage>(
+        modifiers: [(AnyView) -> AnyView],
+        type: Storage.Type
+    ) -> ViewStorage where Storage: AppStorage {
+        let content = content().storage(modifiers: modifiers, type: type)
+        let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state
         if #available(macOS 14, *), #available(iOS 17, *), state.contains(where: { $0.value.isObservable }) {
             observe(storage: storage)

@@ -13,10 +13,15 @@ extension Array: AnyView where Element == AnyView {
     public var viewContent: Body { self }
 
     /// Get a widget from a collection of views.
-    /// - Parameter modifiers: Modify views before being updated.
+    /// - Parameters:
+    ///     - modifiers: Modify views before being updated.
+    ///     - type: The app storage type.
     /// - Returns: A widget.
-    public func widget(modifiers: [(AnyView) -> AnyView]) -> Widget {
-        if count == 1, let widget = self[safe: 0]?.widget(modifiers: modifiers) {
+    public func widget<Storage>(
+        modifiers: [(AnyView) -> AnyView],
+        type: Storage.Type
+    ) -> Widget where Storage: AppStorage {
+        if count == 1, let widget = self[safe: 0]?.widget(modifiers: modifiers, type: type) {
             return widget
         } else {
             var modified = self
@@ -25,7 +30,7 @@ extension Array: AnyView where Element == AnyView {
                     modified[safe: index] = modifier(view)
                 }
             }
-            return Wrapper { modified }
+            return Storage.WrapperType { modified }
         }
     }
 
@@ -34,17 +39,17 @@ extension Array: AnyView where Element == AnyView {
     ///     - storage: The collection of view storages.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    ///     - type: The type of the widgets.
-    public func update<WidgetType>(
+    ///     - type: The type of the app storage.
+    public func update<Storage>(
         _ storage: [ViewStorage],
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
-        type: WidgetType.Type
-    ) {
+        type: Storage.Type
+    ) where Storage: AppStorage {
         for (index, element) in filter({ $0.renderable(type: type, modifiers: modifiers) }).enumerated() {
             if let storage = storage[safe: index] {
                 element
-                    .widget(modifiers: modifiers)
+                    .widget(modifiers: modifiers, type: type)
                     .updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
             }
         }
@@ -53,12 +58,12 @@ extension Array: AnyView where Element == AnyView {
     /// Get the view storages of a collection of views.
     /// - Parameters:
     ///     - modifiers: Modify views before generating the storages.
-    ///     - type: The type of the widgets.
+    ///     - type: The type of the app storage.
     /// - Returns: The storages.
-    public func storages<WidgetType>(
+    public func storages<Storage>(
         modifiers: [(AnyView) -> AnyView],
-        type: WidgetType.Type
-    ) -> [ViewStorage] {
+        type: Storage.Type
+    ) -> [ViewStorage] where Storage: AppStorage {
         compactMap { view in
             view.renderable(type: type, modifiers: modifiers) ? view.storage(modifiers: modifiers, type: type) : nil
         }

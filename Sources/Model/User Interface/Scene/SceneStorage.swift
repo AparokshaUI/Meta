@@ -12,8 +12,7 @@ public class SceneStorage {
     public var id: String
     /// The pointer.
     ///
-    /// It can be a C pointer, a Swift class, or other information depending on the backend,
-    /// or it can be left out.
+    /// It can be a C pointer, a Swift class, or other information depending on the backend.
     public var pointer: Any?
     /// The scene element's view content.
     public var content: [String: [ViewStorage]]

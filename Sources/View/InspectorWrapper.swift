@@ -16,11 +16,14 @@ struct InspectorWrapper: ConvenienceWidget {
     /// The view storage.
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
-    ///     - type: The type of the widgets.
-    func container<WidgetType>(modifiers: [(any AnyView) -> any AnyView], type: WidgetType.Type) -> ViewStorage {
+    ///     - type: The type of the app storage.
+    func container<Storage>(
+        modifiers: [(any AnyView) -> any AnyView],
+        type: Storage.Type
+    ) -> ViewStorage where Storage: AppStorage {
         let storage = content.storage(modifiers: modifiers, type: type)
         modify(storage)
-        return .init(nil, content: [.mainContent: [storage]])
+        return storage
     }
 
     /// Update the stored content.
@@ -28,16 +31,13 @@ struct InspectorWrapper: ConvenienceWidget {
     ///     - storage: The storage to update.
     ///     - modifiers: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
-    ///     - type: The type of the widgets.
-    func update<WidgetType>(
+    ///     - type: The type of the app storage.
+    func update<Storage>(
         _ storage: ViewStorage,
         modifiers: [(any AnyView) -> any AnyView],
         updateProperties: Bool,
-        type: WidgetType.Type
-    ) {
-        guard let storage = storage.content[.mainContent]?.first else {
-            return
-        }
+        type: Storage.Type
+    ) where Storage: AppStorage {
         content.updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
         modify(storage)
     }
