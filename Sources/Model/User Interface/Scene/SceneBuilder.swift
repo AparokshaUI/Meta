@@ -1,21 +1,21 @@
 //
-//  ViewBuilder.swift
+//  SceneBuilder.swift
 //  Meta
 //
-//  Created by david-swift on 26.05.24.
+//  Created by david-swift on 30.06.24.
 //
 
 import Foundation
 
-/// The ``ViewBuilder`` is a result builder for views.
+/// The ``SceneBuilder`` is a result builder for scenes.
 @resultBuilder
-public enum ViewBuilder {
+public enum SceneBuilder {
 
-    /// A component used in the ``ViewBuilder``.
+    /// A component used in the ``SceneBuilder``.
     public enum Component {
 
-        /// A view as a component.
-        case element(_: AnyView)
+        /// A scene as a component.
+        case element(_: any SceneElement)
         /// An array of components as a component.
         case components(_: [Self])
 
@@ -28,17 +28,17 @@ public enum ViewBuilder {
         .components(elements)
     }
 
-    /// Translate an element into a ``ViewBuilder.Component``.
+    /// Translate an element into a ``SceneBuilder.Component``.
     /// - Parameter element: The element to translate.
     /// - Returns: A component created from the element.
-    public static func buildExpression(_ element: AnyView) -> Component {
+    public static func buildExpression(_ element: any SceneElement) -> Component {
         .element(element)
     }
 
-    /// Translate an array of elements into a ``ViewBuilder.Component``.
+    /// Translate an array of elements into a ``SceneBuilder.Component``.
     /// - Parameter elements: The elements to translate.
     /// - Returns: A component created from the element.
-    public static func buildExpression(_ elements: [AnyView]) -> Component {
+    public static func buildExpression(_ elements: [any SceneElement]) -> Component {
         var components: [Component] = []
         for element in elements {
             components.append(.element(element))
@@ -56,7 +56,7 @@ public enum ViewBuilder {
     /// Convert a component to an array of elements.
     /// - Parameter component: The component to convert.
     /// - Returns: The generated array of elements.
-    public static func buildFinalResult(_ component: Component) -> Body {
+    public static func buildFinalResult(_ component: Component) -> Scene {
         switch component {
         case let .element(element):
             return [element]

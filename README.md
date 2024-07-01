@@ -31,7 +31,7 @@ _Meta_ follows the following principles:
 It knows the following layers of UI:
 
 - An app is the entry point of the executable, containing the windows.
-- A window is a container holding one or multiple views.
+- A scene element is a template for a container holding one or multiple views (e.g. a window).
 - A view is a part of the actual UI inside a window, another view or a menu.
 - A menu is a list of buttons, other menus, and views. Certain views (such as menu buttons) allow menus to be used.
 

@@ -3,16 +3,44 @@ import Meta
 import Observation
 import SampleBackends
 
+@main
+struct TestExecutable {
+
+    public static func main() {
+        DemoApp.main()
+        sleep(2)
+    }
+
+}
+
+@available(macOS 14, *)
+@available(iOS 17, *)
+struct DemoApp: App {
+
+    typealias Storage = Backend1.Backend1App
+    let id = "io.github.AparokshaUI.DemoApp"
+    var app: Backend1.Backend1App!
+
+    var scene: Scene {
+        Backend1.Window("main", spawn: 1) {
+            DemoView(app: app)
+        }
+    }
+
+}
+
 @available(macOS 14, *)
 @available(iOS 17, *)
 struct DemoView: View {
 
     @State private var model = TestModel()
+    var app: Backend1.Backend1App
 
     var view: Body {
         Backend1.TestWidget1()
         Backend1.Button(model.test) {
             model.test = "\(Int.random(in: 1...10))"
+            app.addSceneElement("main")
         }
         TestView()
         testContent
@@ -51,26 +79,3 @@ class TestModel {
 
 }
 
-@main
-@available(macOS 14, *)
-@available(iOS 17, *)
-struct DemoApp {
-
-    static func main() {
-        let backendType = Backend1.BackendWidget.self
-
-        let storage = DemoView().storage(modifiers: [], type: backendType)
-        for round in 0...2 {
-            print("#\(round)")
-            DemoView().updateStorage(storage, modifiers: [], updateProperties: true, type: backendType)
-        }
-
-        StateManager.addUpdateHandler { force in
-            print("#*")
-            DemoView().updateStorage(storage, modifiers: [], updateProperties: force, type: backendType)
-        }
-
-        sleep(2)
-    }
-
-}

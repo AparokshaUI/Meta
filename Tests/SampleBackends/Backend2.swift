@@ -40,4 +40,28 @@ public enum Backend2 {
 
     public protocol BackendWidget: Widget { }
 
+    public protocol BackendSceneElement: SceneElement { }
+
+    public class Backend2App: AppStorage {
+
+        public typealias SceneElementType = BackendSceneElement
+        public typealias WidgetType = BackendWidget
+
+        public var app: () -> any App
+        public var sceneStorage: [SceneStorage] = []
+
+        public required init(id: String, app: @escaping () -> any App) {
+            self.app = app
+        }
+
+        public func run(setup: @escaping () -> Void) {
+            setup()
+        }
+
+        public func quit() {
+            fatalError("Quit")
+        }
+
+    }
+
 }

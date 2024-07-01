@@ -14,6 +14,8 @@ public enum StateManager {
     public static var blockUpdates = false
     /// Whether to save state.
     public static var saveState = true
+    /// The application identifier.
+    static var appID: String?
     /// The functions handling view updates.
     static var updateHandlers: [(Bool) -> Void] = []
     /// The state.
@@ -35,7 +37,7 @@ public enum StateManager {
         func contains(id: UUID) -> Bool {
             ids.first == id || ids.second == id
         }
-        
+
         /// Change the identifier to a new one.
         /// - Parameter newID: The new identifier.
         mutating func changeID(new newID: UUID) {

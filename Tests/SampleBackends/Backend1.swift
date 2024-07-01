@@ -70,7 +70,67 @@ public enum Backend1 {
 
     }
 
+    public struct Window: BackendSceneElement {
+
+        public var id: String
+        var spawn: Int
+        var content: Body
+
+        public init(_ id: String, spawn: Int, @ViewBuilder content: () -> Body) {
+            self.id = id
+            self.spawn = spawn
+            self.content = content()
+        }
+
+        public func setupInitialContainers<Storage>(app: Storage) where Storage: AppStorage {
+            for _ in 0..<spawn {
+                app.sceneStorage.append(container(app: app))
+            }
+        }
+
+        public func container<Storage>(app: Storage) -> SceneStorage where Storage: AppStorage {
+            print("Show \(id)")
+            let viewStorage = content.storage(modifiers: [], type: Storage.WidgetType.self)
+            return .init(id: id, pointer: nil, content: [.mainContent : [viewStorage]]) {
+                print("Make visible")
+            }
+        }
+
+        public func update<Storage>(_ storage: SceneStorage, app: Storage, updateProperties: Bool) where Storage: AppStorage {
+            print("Update \(id)")
+            guard let viewStorage = storage.content[.mainContent]?.first else {
+                return
+            }
+            content.updateStorage(viewStorage, modifiers: [], updateProperties: updateProperties, type: Storage.WidgetType.self)
+        }
+
+    }
+
     public protocol BackendWidget: Widget { }
+
+    public protocol BackendSceneElement: SceneElement { }
+
+    public class Backend1App: AppStorage {
+
+        public typealias SceneElementType = BackendSceneElement
+        public typealias WidgetType = BackendWidget
+
+        public var app: () -> any App
+        public var sceneStorage: [SceneStorage] = []
+
+        public required init(id: String, app: @escaping () -> any App) {
+            self.app = app
+        }
+
+        public func run(setup: @escaping () -> Void) {
+            setup()
+        }
+
+        public func quit() {
+            fatalError("Quit")
+        }
+
+    }
 
 }
 
