@@ -4,6 +4,8 @@ import Observation
 import SampleBackends
 
 @main
+@available(macOS 14, *)
+@available(iOS 17, *)
 struct TestExecutable {
 
     public static func main() {
@@ -17,9 +19,12 @@ struct TestExecutable {
 @available(iOS 17, *)
 struct DemoApp: App {
 
-    typealias Storage = Backend1.Backend1App
     let id = "io.github.AparokshaUI.DemoApp"
+    // #if os(...)
     var app: Backend1.Backend1App!
+    // #else
+    // var app: Backend2.Backend2App!
+    // #endif
 
     var scene: Scene {
         Backend1.Window("main", spawn: 1) {
@@ -34,7 +39,7 @@ struct DemoApp: App {
 struct DemoView: View {
 
     @State private var model = TestModel()
-    var app: Backend1.Backend1App
+    var app: any AppStorage
 
     var view: Body {
         Backend1.TestWidget1()
