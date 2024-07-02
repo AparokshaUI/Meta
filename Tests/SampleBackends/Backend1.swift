@@ -84,7 +84,7 @@ public enum Backend1 {
 
         public func setupInitialContainers<Storage>(app: Storage) where Storage: AppStorage {
             for _ in 0..<spawn {
-                app.sceneStorage.append(container(app: app))
+                app.storage.sceneStorage.append(container(app: app))
             }
         }
 
@@ -140,7 +140,7 @@ public enum Backend1 {
         public typealias WrapperType = Wrapper
 
         public var app: () -> any App
-        public var sceneStorage: [SceneStorage] = []
+        public var storage: StandardAppStorage = .init()
 
         public required init(id: String, app: @escaping () -> any App) {
             self.app = app

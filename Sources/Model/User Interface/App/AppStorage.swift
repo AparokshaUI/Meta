@@ -19,7 +19,7 @@ public protocol AppStorage: AnyObject {
     var app: () -> any App { get }
 
     /// The scene storage.
-    var sceneStorage: [SceneStorage] { get set }
+    var storage: StandardAppStorage { get set }
 
     /// Initialize the app storage.
     /// - Parameters:
@@ -41,7 +41,7 @@ extension AppStorage {
     /// Focus the scene element with a certain id (if supported). Create the element if it doesn't already exist.
     /// - Parameter id: The element's id.
     public func showSceneElement(_ id: String) {
-        sceneStorage.last { $0.id == id && !$0.destroy }?.show() ?? addSceneElement(id)
+        storage.sceneStorage.last { $0.id == id && !$0.destroy }?.show() ?? addSceneElement(id)
     }
 
     /// Add a new scene element with the content of the scene element with a certain id.
@@ -49,7 +49,7 @@ extension AppStorage {
     public func addSceneElement(_ id: String) {
         if let element = app().scene.last(where: { $0.id == id }) {
             let container = element.container(app: self)
-            sceneStorage.append(container)
+            storage.sceneStorage.append(container)
             showSceneElement(id)
         }
     }

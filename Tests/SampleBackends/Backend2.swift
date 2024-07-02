@@ -72,7 +72,7 @@ public enum Backend2 {
         public typealias WrapperType = Wrapper
 
         public var app: () -> any App
-        public var sceneStorage: [SceneStorage] = []
+        public var storage: StandardAppStorage = .init()
 
         public required init(id: String, app: @escaping () -> any App) {
             self.app = app
