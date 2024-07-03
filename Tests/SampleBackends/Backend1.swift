@@ -70,6 +70,39 @@ public enum Backend1 {
 
     }
 
+    public struct Menu: BackendWidget, MenuElement {
+
+        var label: String
+        var content: MenuContent
+
+        public init(_ label: String, @Builder<MenuElement> content: @escaping () -> MenuContent) {
+            self.label = label
+            self.content = content()
+        }
+
+        public func container<RenderableType>(type: RenderableType.Type, fields: [String : Any]) -> RenderableStorage {
+            .init(nil)
+        }
+
+        public func update<RenderableType>(_ storage: RenderableStorage, updateProperties: Bool, type: RenderableType.Type, fields: [String : Any]) {
+            print("Update renderable")
+        }
+
+        public func container<Storage>(modifiers: [(any AnyView) -> any AnyView], type: Storage.Type) -> ViewStorage where Storage: AppStorage {
+            let storage = ViewStorage(nil)
+            storage.renderableContent[.mainContent] = (content as [Renderable]).storages(type: MenuElement.self, fields: [:]) ?? []
+            return storage
+        }
+
+        public func update<Storage>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Storage.Type) {
+            guard updateProperties, let content = storage.renderableContent[.mainContent] else {
+                return
+            }
+            (self.content as [Renderable]).update(content, updateProperties: updateProperties, type: MenuElement.self, fields: [:])
+        }
+
+    }
+
     public struct Window: BackendSceneElement {
 
         public var id: String
@@ -132,6 +165,10 @@ public enum Backend1 {
     public protocol BackendWidget: Widget { }
 
     public protocol BackendSceneElement: SceneElement { }
+
+    public protocol MenuElement: Renderable { }
+
+    public typealias MenuContent = [MenuElement]
 
     public class Backend1App: AppStorage {
 

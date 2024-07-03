@@ -36,18 +36,18 @@ extension Array: AnyView where Element == AnyView {
 
     /// Update a collection of views with a collection of view storages.
     /// - Parameters:
-    ///     - storage: The collection of view storages.
+    ///     - storages: The collection of view storages.
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
     public func update<Storage>(
-        _ storage: [ViewStorage],
+        _ storages: [ViewStorage],
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
         type: Storage.Type
     ) where Storage: AppStorage {
         for (index, element) in filter({ $0.renderable(type: type, modifiers: modifiers) }).enumerated() {
-            if let storage = storage[safe: index] {
+            if let storage = storages[safe: index] {
                 element
                     .widget(modifiers: modifiers, type: type)
                     .updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
@@ -111,6 +111,47 @@ extension Array where Element: Identifiable {
     ///   ```
     public subscript(id id: Element.ID) -> Element? {
         self[safe: firstIndex { $0.id == id }]
+    }
+
+}
+
+extension Array where Element == Renderable {
+
+    /// Update a collection of renderable elements.
+    /// - Parameters:
+    ///     - storage: The collection of renderable storages.
+    ///     - updateProperties: Whether to update properties.
+    ///     - type: The type of the renderable element.
+    ///     - fields: Additional information.
+    public func update<RenderableType>(
+        _ storages: [RenderableStorage],
+        updateProperties: Bool,
+        type: RenderableType.Type,
+        fields: [String: Any]
+    ) {
+        for (index, element) in filter({ $0 as? RenderableType != nil }).enumerated() {
+            if let storage = storages[safe: index] {
+                element
+                    .update(storage, updateProperties: updateProperties, type: type, fields: fields)
+            }
+        }
+    }
+
+    /// Get the renderable storages of a collection of renderable elements.
+    /// - Parameters:
+    ///     - type: The type of the renderable element.
+    ///     - fields: Additional information.
+    /// - Returns: The storages.
+    public func storages<RenderableType>(
+        type: RenderableType.Type,
+        fields: [String: Any]
+    ) -> [RenderableStorage] {
+        compactMap { element in
+            if element as? RenderableType != nil {
+                return element.container(type: type, fields: fields)
+            }
+            return nil
+        }
     }
 
 }

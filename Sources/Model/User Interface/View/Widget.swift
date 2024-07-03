@@ -19,6 +19,7 @@ public protocol Widget: AnyView {
         modifiers: [(AnyView) -> AnyView],
         type: Storage.Type
     ) -> ViewStorage where Storage: AppStorage
+
     /// Update the stored content.
     /// - Parameters:
     ///     - storage: The storage to update.

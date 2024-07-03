@@ -32,8 +32,8 @@ It knows the following layers of UI:
 
 - An app is the entry point of the executable, containing the windows.
 - A scene element is a template for a container holding one or multiple views (e.g. a window).
-- A view is a part of the actual UI inside a window, another view or a menu.
-- A menu is a list of buttons, other menus, and views. Certain views (such as menu buttons) allow menus to be used.
+- A view is a part of the actual UI inside a window, another view, or another renderable component.
+- Custom renderable components can be used for more restrictive UI elements, such as menus.
 
 Detailed information can be found in the [docs](https://aparokshaui.github.io/meta/).
 

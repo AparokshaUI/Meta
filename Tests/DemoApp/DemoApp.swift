@@ -71,6 +71,10 @@ struct TestView: View {
                 test = "\(Int.random(in: 1...10))"
             }
         }
+        Backend1.Menu("Hi") {
+            Backend1.Menu("World") {
+            }
+        }
     }
 
 }

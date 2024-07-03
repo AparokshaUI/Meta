@@ -14,6 +14,8 @@ public class ViewStorage {
     public var pointer: Any?
     /// The view's content for container widgets.
     public var content: [String: [ViewStorage]]
+    /// The view's renderable content.
+    public var renderableContent: [String: [RenderableStorage]] = [:]
     /// The view's state (used in `StateWrapper`).
     var state: [String: StateProtocol] = [:]
     /// Various properties of a widget.
