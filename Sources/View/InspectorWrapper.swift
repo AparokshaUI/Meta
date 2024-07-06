@@ -9,7 +9,7 @@
 struct InspectorWrapper: ConvenienceWidget {
 
     /// The custom code to edit the widget.
-    var modify: (ViewStorage) -> Void
+    var modify: (ViewStorage, Bool) -> Void
     /// The wrapped view.
     var content: AnyView
 
@@ -22,7 +22,7 @@ struct InspectorWrapper: ConvenienceWidget {
         type: Storage.Type
     ) -> ViewStorage where Storage: AppStorage {
         let storage = content.storage(modifiers: modifiers, type: type)
-        modify(storage)
+        modify(storage, true)
         return storage
     }
 
@@ -39,7 +39,7 @@ struct InspectorWrapper: ConvenienceWidget {
         type: Storage.Type
     ) where Storage: AppStorage {
         content.updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
-        modify(storage)
+        modify(storage, updateProperties)
     }
 
 }
@@ -47,9 +47,9 @@ struct InspectorWrapper: ConvenienceWidget {
 extension AnyView {
 
     /// Run a custom code accessing the view's storage when initializing and updating the view.
-    /// - Parameter modify: Modify the storage.
+    /// - Parameter modify: Modify the storage. The boolean indicates whether state in parent views changed.
     /// - Returns: A view.
-    public func inspect(_ modify: @escaping (ViewStorage) -> Void) -> AnyView {
+    public func inspect(_ modify: @escaping (ViewStorage, Bool) -> Void) -> AnyView {
         InspectorWrapper(modify: modify, content: self)
     }
 
@@ -57,7 +57,7 @@ extension AnyView {
     /// - Parameter onUpdate: The function.
     /// - Returns: A view.
     public func onUpdate(_ onUpdate: @escaping () -> Void) -> AnyView {
-        inspect { _ in onUpdate() }
+        inspect { _, _ in onUpdate() }
     }
 
 }
