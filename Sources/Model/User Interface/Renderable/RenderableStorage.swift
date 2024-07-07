@@ -14,6 +14,8 @@ public class RenderableStorage {
     public var pointer: Any?
     /// Various properties of a widget.
     public var fields: [String: Any] = [:]
+    /// Other renderable storage elements.
+    public var content: [String: [RenderableStorage]] = [:]
 
     /// The pointer as an opaque pointer, as this is may be needed with backends interoperating with C or C++.
     public var opaquePointer: OpaquePointer? {
@@ -26,9 +28,12 @@ public class RenderableStorage {
     }
 
     /// Initialize a renderable storage.
-    /// - Parameter pointer: The pointer to the renderable element, its type depends on the backend.
-    public init(_ pointer: Any?, content: [String: [ViewStorage]] = [:]) {
+    /// - Parameters:
+    ///     - pointer: The pointer to the renderable element, its type depends on the backend.
+    ///     - content: Other renderable storages.
+    public init(_ pointer: Any?, content: [String: [RenderableStorage]] = [:]) {
         self.pointer = pointer
+        self.content = content
     }
 
 }
