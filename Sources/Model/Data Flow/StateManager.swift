@@ -51,7 +51,7 @@ public enum StateManager {
     /// - Parameter force: Whether to force all views to update.
     ///
     /// Nothing happens if ``UpdateManager/blockUpdates`` is true.
-    static func updateViews(force: Bool = false) {
+    public static func updateViews(force: Bool = false) {
         if !blockUpdates {
             for handler in updateHandlers {
                 handler(force)
