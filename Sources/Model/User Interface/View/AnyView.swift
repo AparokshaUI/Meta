@@ -75,6 +75,15 @@ extension AnyView {
         || result as? Body != nil
     }
 
+    /// Apply a modification onto a view.
+    /// - Parameter action: The modifications.
+    /// - Returns: The modified view.
+    public func modify(action: (inout Self) -> Void) -> Self {
+        var newSelf = self
+        action(&newSelf)
+        return newSelf
+    }
+
 }
 
 /// `Body` is an array of views.

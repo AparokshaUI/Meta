@@ -90,7 +90,7 @@ public enum Backend1 {
 
         public func container<Storage>(modifiers: [(any AnyView) -> any AnyView], type: Storage.Type) -> ViewStorage where Storage: AppStorage {
             let storage = ViewStorage(nil)
-            storage.renderableContent[.mainContent] = (content as [Renderable]).storages(type: MenuElement.self, fields: [:]) ?? []
+            storage.renderableContent[.mainContent] = (content as [Renderable]).storages(type: MenuElement.self, fields: [:])
             return storage
         }
 
