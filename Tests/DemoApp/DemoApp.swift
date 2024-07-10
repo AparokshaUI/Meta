@@ -1,5 +1,5 @@
 import Foundation
-import Meta
+@testable import Meta
 import Observation
 import SampleBackends
 
@@ -44,8 +44,9 @@ struct DemoView: View {
     var view: Body {
         Backend1.TestWidget1()
         Backend1.Button(model.test) {
-            model.test = "\(Int.random(in: 1...10))"
-            app.addSceneElement("main")
+            Task {
+                app.addSceneElement("main")
+            }
         }
         TestView()
         testContent
@@ -66,10 +67,7 @@ struct TestView: View {
     var view: Body {
         Backend2.TestWidget4()
         Backend1.Button(test) {
-            Task {
-                try await Task.sleep(nanoseconds: 100_000_000)
-                test = "\(Int.random(in: 1...10))"
-            }
+            test = "\(Int.random(in: 1...10))"
         }
         Backend1.Menu("Hi") {
             Backend1.Menu("World") {

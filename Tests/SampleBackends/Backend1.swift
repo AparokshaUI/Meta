@@ -60,9 +60,9 @@ public enum Backend1 {
         }
 
         public func update<Storage>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Storage.Type) {
+            storage.fields["action"] = action
             if updateProperties {
                 print("Update button (label = \(label))")
-                storage.fields["action"] = action
             } else {
                 print("Do not update button (label = \(label))")
             }

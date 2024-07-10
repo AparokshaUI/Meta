@@ -24,8 +24,8 @@ public enum StateManager {
     /// Information about a piece of state.
     struct State {
 
-        /// The state's identifiers.
-        var ids: (first: UUID, second: UUID?)
+        /// The state's identifier.
+        var id: UUID
         /// The state value.
         var value: Any?
         /// Whether to update in the next iteration.
@@ -35,14 +35,13 @@ public enum StateManager {
         /// - Parameter id: The identifier.
         /// - Returns: Whether the id is contained.
         func contains(id: UUID) -> Bool {
-            ids.first == id || ids.second == id
+            id == self.id
         }
 
         /// Change the identifier to a new one.
         /// - Parameter newID: The new identifier.
         mutating func changeID(new newID: UUID) {
-            ids.second = ids.first
-            ids.first = newID
+            id = newID
         }
 
     }
@@ -72,7 +71,7 @@ public enum StateManager {
     static func setState(id: UUID, value: Any?) {
         if saveState {
             guard let index = state.firstIndex(where: { $0.contains(id: id) }) else {
-                state.append(.init(ids: (first: id, second: nil), value: value))
+                state.append(.init(id: id, value: value))
                 return
             }
             state[safe: index]?.value = value
