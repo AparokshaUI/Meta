@@ -119,7 +119,7 @@ extension Array where Element == Renderable {
 
     /// Update a collection of renderable elements.
     /// - Parameters:
-    ///     - storage: The collection of renderable storages.
+    ///     - storages: The collection of renderable storages.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the renderable element.
     ///     - fields: Additional information.

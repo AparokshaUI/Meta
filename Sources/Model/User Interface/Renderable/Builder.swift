@@ -7,11 +7,11 @@
 
 import Foundation
 
-/// The ``Builder`` is a result builder for scenes.
+/// The ``Builder`` is a result builder for custom data.
 @resultBuilder
 public enum Builder<RenderableType> {
 
-    /// A component used in the ``MenuBuilder``.
+    /// A component used in the ``Builder``.
     public enum Component {
 
         /// A renderable element as a component.
@@ -22,20 +22,20 @@ public enum Builder<RenderableType> {
     }
 
     /// Build combined results from statement blocks.
-    /// - Parameter components: The components.
+    /// - Parameter elements: The components.
     /// - Returns: The components in a component.
     public static func buildBlock(_ elements: Component...) -> Component {
         .components(elements)
     }
 
-    /// Translate an element into a ``MenuBuilder.Component``.
+    /// Translate an element into a ``Builder/Component``.
     /// - Parameter element: The element to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ element: RenderableType) -> Component {
         .element(element)
     }
 
-    /// Translate an array of elements into a ``MenuBuilder.Component``.
+    /// Translate an array of elements into a ``Builder/Component``.
     /// - Parameter elements: The elements to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ elements: [RenderableType]) -> Component {

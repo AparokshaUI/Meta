@@ -5,7 +5,7 @@
 //  Created by david-swift on 26.05.24.
 //
 
-/// Store a reference to a rendered view in a view storage.
+/// Store a reference to a rendered element in a renderable storage.
 public class RenderableStorage {
 
     /// The pointer.

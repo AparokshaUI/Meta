@@ -22,20 +22,20 @@ public enum ViewBuilder {
     }
 
     /// Build combined results from statement blocks.
-    /// - Parameter components: The components.
+    /// - Parameter elements: The components.
     /// - Returns: The components in a component.
     public static func buildBlock(_ elements: Component...) -> Component {
         .components(elements)
     }
 
-    /// Translate an element into a ``ViewBuilder.Component``.
+    /// Translate an element into a ``ViewBuilder/Component``.
     /// - Parameter element: The element to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ element: AnyView) -> Component {
         .element(element)
     }
 
-    /// Translate an array of elements into a ``ViewBuilder.Component``.
+    /// Translate an array of elements into a ``ViewBuilder/Component``.
     /// - Parameter elements: The elements to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ elements: [AnyView]) -> Component {

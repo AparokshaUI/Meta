@@ -49,7 +49,7 @@ public enum StateManager {
     /// Update all of the views.
     /// - Parameter force: Whether to force all views to update.
     ///
-    /// Nothing happens if ``UpdateManager/blockUpdates`` is true.
+    /// Nothing happens if ``StateManager/blockUpdates`` is true.
     public static func updateViews(force: Bool = false) {
         if !blockUpdates {
             for handler in updateHandlers {
@@ -60,7 +60,7 @@ public enum StateManager {
 
     /// Add a handler that is called when the user interface should update.
     /// - Parameter handler: The handler. The parameter defines whether the whole UI should be force updated.
-    public static func addUpdateHandler(handler: @escaping (Bool) -> Void) {
+    static func addUpdateHandler(handler: @escaping (Bool) -> Void) {
         updateHandlers.append(handler)
     }
 

@@ -22,20 +22,20 @@ public enum SceneBuilder {
     }
 
     /// Build combined results from statement blocks.
-    /// - Parameter components: The components.
+    /// - Parameter elements: The components.
     /// - Returns: The components in a component.
     public static func buildBlock(_ elements: Component...) -> Component {
         .components(elements)
     }
 
-    /// Translate an element into a ``SceneBuilder.Component``.
+    /// Translate an element into a ``SceneBuilder/Component``.
     /// - Parameter element: The element to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ element: any SceneElement) -> Component {
         .element(element)
     }
 
-    /// Translate an array of elements into a ``SceneBuilder.Component``.
+    /// Translate an array of elements into a ``SceneBuilder/Component``.
     /// - Parameter elements: The elements to translate.
     /// - Returns: A component created from the element.
     public static func buildExpression(_ elements: [any SceneElement]) -> Component {

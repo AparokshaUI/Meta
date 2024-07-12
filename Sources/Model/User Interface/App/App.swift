@@ -14,6 +14,7 @@ import Observation
 /// struct Test: App {
 ///
 ///     let id = "io.github.AparokshaUI.TestApp"
+///     var app: BackendApp!
 ///
 ///     var scene: Scene {
 ///         WindowScene()
@@ -24,7 +25,7 @@ import Observation
 ///
 public protocol App {
 
-    /// The app storage typ.
+    /// The app storage type.
     associatedtype Storage: AppStorage
 
     /// The app's application ID.
@@ -54,8 +55,9 @@ extension App {
     }
 
     /// Initialize and get the app with the app storage.
+    /// - Returns: The app instance.
     ///
-    /// To run the app, call the ``AppStorage/run(automaticSetup:manualSetup:)`` function.
+    /// To run the app, call the ``AppStorage/run(setup:)`` function.
     public static func setupApp() -> Self {
         var appInstance = self.init()
         appInstance.app = Storage(id: appInstance.id) { appInstance }
