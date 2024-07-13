@@ -15,10 +15,10 @@ struct ModifierStopper: ConvenienceWidget {
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the app storage.
-    func container<Storage>(
+    func container<Data>(
         modifiers: [(any AnyView) -> any AnyView],
-        type: Storage.Type
-    ) -> ViewStorage where Storage: AppStorage {
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
         content.storage(modifiers: [], type: type)
     }
 
@@ -28,12 +28,12 @@ struct ModifierStopper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
     ///     - type: The type of the app storage.
-    func update<Storage>(
+    func update<Data>(
         _ storage: ViewStorage,
         modifiers: [(any AnyView) -> any AnyView],
         updateProperties: Bool,
-        type: Storage.Type
-    ) where Storage: AppStorage {
+        type: Data.Type
+    ) where Data: ViewRenderData {
         content.updateStorage(storage, modifiers: [], updateProperties: updateProperties, type: type)
     }
 

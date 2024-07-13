@@ -10,22 +10,13 @@ public protocol AppStorage: AnyObject {
 
     /// The type of scene elements (which should be backend-specific).
     associatedtype SceneElementType
-    /// The type of widget elements (which should be backend-specific).
-    associatedtype WidgetType
-    /// The wrapper widget.
-    associatedtype WrapperType: Wrapper
-
-    /// The scene.
-    var app: () -> any App { get }
 
     /// The scene storage.
     var storage: StandardAppStorage { get set }
 
     /// Initialize the app storage.
-    /// - Parameters:
-    ///     - id: The app's identifier.
-    ///     - app: Get the application.
-    init(id: String, app: @escaping () -> any App)
+    /// - Parameters id: The app's identifier.
+    init(id: String)
 
     /// Run the application.
     /// - Parameter setup: A closure that is expected to be executed right at the beginning.
@@ -47,7 +38,7 @@ extension AppStorage {
     /// Add a new scene element with the content of the scene element with a certain id.
     /// - Parameter id: The element's id.
     public func addSceneElement(_ id: String) {
-        if let element = app().scene.last(where: { $0.id == id }) {
+        if let element = storage.app?().scene.last(where: { $0.id == id }) {
             let container = element.container(app: self)
             storage.sceneStorage.append(container)
             showSceneElement(id)

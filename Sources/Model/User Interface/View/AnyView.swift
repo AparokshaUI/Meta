@@ -29,12 +29,12 @@ extension AnyView {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
-    public func updateStorage<Storage>(
+    public func updateStorage<Data>(
         _ storage: ViewStorage,
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
-        type: Storage.Type
-    ) where Storage: AppStorage {
+        type: Data.Type
+    ) where Data: ViewRenderData {
         widget(modifiers: modifiers, type: type)
             .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
@@ -44,31 +44,31 @@ extension AnyView {
     ///     - modifiers: Modify views before being updated.
     ///     - type: The widget types.
     /// - Returns: The storage.
-    public func storage<Storage>(
+    public func storage<Data>(
         modifiers: [(AnyView) -> AnyView],
-        type: Storage.Type
-    ) -> ViewStorage where Storage: AppStorage {
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
         widget(modifiers: modifiers, type: type).container(modifiers: modifiers, type: type)
     }
 
     /// Wrap the view into a widget.
     /// - Parameter modifiers: Modify views before being updated.
     /// - Returns: The widget.
-    func widget<Storage>(modifiers: [(AnyView) -> AnyView], type: Storage.Type) -> Widget where Storage: AppStorage {
+    func widget<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> Widget where Data: ViewRenderData {
         let modified = getModified(modifiers: modifiers)
         if let peer = modified as? Widget {
             return peer
         }
         if let array = modified as? Body {
-            return Storage.WrapperType { array }
+            return Data.WrapperType { array }
         }
-        return Storage.WrapperType { viewContent.map { $0.getModified(modifiers: modifiers) } }
+        return Data.WrapperType { viewContent.map { $0.getModified(modifiers: modifiers) } }
     }
 
     /// Whether the view can be rendered in a certain environment.
-    func renderable<Storage>(type: Storage.Type, modifiers: [(AnyView) -> AnyView]) -> Bool where Storage: AppStorage {
+    func renderable<Data>(type: Data.Type, modifiers: [(AnyView) -> AnyView]) -> Bool where Data: ViewRenderData {
         let result = getModified(modifiers: modifiers)
-        return result as? Storage.WidgetType != nil
+        return result as? Data.WidgetType != nil
         || result as? SimpleView != nil
         || result as? View != nil
         || result as? ConvenienceWidget != nil
