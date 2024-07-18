@@ -15,6 +15,7 @@ public protocol Widget: AnyView {
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the app storage.
+    /// - Returns: The view storage.
     func container<Data>(
         modifiers: [(AnyView) -> AnyView],
         type: Data.Type

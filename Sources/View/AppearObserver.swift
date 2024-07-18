@@ -17,6 +17,7 @@ struct AppearObserver: ConvenienceWidget {
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the app storage.
+    /// - Returns: The view storage.
     func container<Data>(
         modifiers: [(any AnyView) -> any AnyView],
         type: Data.Type

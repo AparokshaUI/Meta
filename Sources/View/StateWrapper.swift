@@ -36,6 +36,7 @@ struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
+    /// - Returns: The view storage.
     func update<Data>(
         _ storage: ViewStorage,
         modifiers: [(AnyView) -> AnyView],
