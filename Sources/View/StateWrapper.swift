@@ -85,11 +85,9 @@ struct StateWrapper: ConvenienceWidget {
         withObservationTracking {
             _ = content()
         } onChange: {
-            Task {
-                StateManager.updateState(id: storage.state.first?.value.id ?? .init())
-                StateManager.updateViews()
-                observe(storage: storage)
-            }
+            StateManager.updateState(id: storage.state.first?.value.id ?? .init())
+            StateManager.updateViews()
+            observe(storage: storage)
         }
     }
 

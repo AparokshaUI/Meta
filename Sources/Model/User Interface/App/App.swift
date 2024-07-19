@@ -113,11 +113,9 @@ extension App {
         withObservationTracking {
             _ = scene
         } onChange: {
-            Task {
-                StateManager.updateState(id: app.storage.stateStorage.first?.value.id ?? .init())
-                StateManager.updateViews()
-                observe()
-            }
+            StateManager.updateState(id: app.storage.stateStorage.first?.value.id ?? .init())
+            StateManager.updateViews()
+            observe()
         }
     }
 

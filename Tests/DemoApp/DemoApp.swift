@@ -60,14 +60,15 @@ struct DemoView: View {
 
 }
 
+@available(macOS 14, *)
 struct TestView: View {
 
-    @State private var test = "Label"
+    @State private var test = TestModel()
 
     var view: Body {
         Backend2.TestWidget4()
-        Backend1.Button(test) {
-            test = "\(Int.random(in: 1...10))"
+        Backend1.Button(test.test) {
+            test.test = "\(Int.random(in: 1...10))"
         }
         Backend1.Menu("Hi") {
             Backend1.Menu("World") {
