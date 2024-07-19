@@ -48,7 +48,7 @@ extension App {
     public static func main() {
         let app = setupApp()
         app.app.run {
-            for element in app.scene {
+            for element in app.scene where element as? Storage.SceneElementType != nil {
                 element.setupInitialContainers(app: app.app)
             }
         }
@@ -60,7 +60,8 @@ extension App {
     /// To run the app, call the ``AppStorage/run(setup:)`` function.
     public static func setupApp() -> Self {
         var appInstance = self.init()
-        appInstance.app = Storage(id: appInstance.id) { appInstance }
+        appInstance.app = Storage(id: appInstance.id)
+        appInstance.app.storage.app = { appInstance }
         StateManager.addUpdateHandler { force in
             var updateProperties = force
             for property in appInstance.getState() {

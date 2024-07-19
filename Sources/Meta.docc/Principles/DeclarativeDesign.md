@@ -77,7 +77,8 @@ Window {
 
 ## Elements of the User Interface
 
-_Meta_ knows different levels of UI. The app is the entry point of the executable. It contains multiple scene elements (e.g., windows on desktop systems, but can also be, e.g., menu bars - simply anything "top-level"), which may contain other scene elements, views, or custom renderable elements (e.g., menus). All of those layers, except for the app layer, are defined using their own domain-specific language.
+_Meta_ knows different levels of UI. The app is the entry point of the executable. It contains multiple scene elements (e.g., windows on desktop systems, but can also be, e.g., menu bars - simply anything "top-level"), which may contain other scene elements, or views.
+All of those layers, except for the app layer, are defined using their own domain-specific language.
 
 The following code shows all of the available levels of UI for a typical desktop _backend_ (but all the elements are backend-specific):
 
@@ -92,7 +93,7 @@ struct AwesomeApp: App { // The app (no DSL)
         Window("Awesome App") { // The view DSL
             ContentView()
                 .padding(10)
-            Menu { // A DSL for custom renderable elements
+            Menu { // The view DSL
                 Button("Hello") { print("Hello") }
                 Button("World") { print("World") }
             }
@@ -102,13 +103,11 @@ struct AwesomeApp: App { // The app (no DSL)
 }
 ```
 
-In the <doc:CreateBackend> tutorial, you will get more familiar with the different levels of UI.
-
 A domain-specific language in _Meta_ consists of the following definitions:
 
-- A result builder translates the domain-specific language into an array (``ViewBuilder`` for views, ``SceneBuilder`` for scenes, ``Builder`` for custom renderable elements).
-- A protocol for elements of the domain (``AnyView`` for views, ``SceneElement`` for scenes, ``Renderable`` for custom renderable elements). When constructing or updating a user interface, functions required by this protocol will be called. The array is "translated" into the actual UI.
-- A storage object persists between updates and saves data concerning a UI element (``ViewStorage`` for views, ``SceneStorage`` for scenes, ``RenderableStorage`` for custom renderable elements). This is required as the UI elements' definitions in the DSL are re-rendered with each update.
+- A result builder translates the domain-specific language into an array (``ViewBuilder`` for views, ``SceneBuilder`` for scenes).
+- A protocol for elements of the domain (``AnyView`` for views, ``SceneElement`` for scenes). When constructing or updating a user interface, functions required by this protocol will be called. The array is "translated" into the actual UI.
+- A storage object persists between updates and saves data concerning a UI element (``ViewStorage`` for views, ``SceneStorage`` for scenes). This is required as the UI elements' definitions in the DSL are re-rendered with each update.
 
 When creating a backend, you define platform-specific UI elements conforming to the protocol for this type of UI element and manage their "translation" into imperative code using the storage object.
 

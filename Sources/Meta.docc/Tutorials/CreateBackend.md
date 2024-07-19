@@ -37,7 +37,8 @@ let package = Package(
 
 ## Backend-Specific Protocols
 
-As mentioned in <doc:Backends>, the backend has to define a backend-specific widget and scene element type.
+As mentioned in <doc:Backends>, the backend has to define a backend-specific scene element type.
+Often, it is sensible to define a widget type for regular views.
 
 ```swift
 import Meta
@@ -47,6 +48,8 @@ public protocol TermKitWidget: Widget { }
 ```
 
 ## The Wrapper Widget
+
+In this section, the widget type for regular views will be extended so that it can be used for rendering.
 
 With _Meta_, arrays of ``AnyView`` have to be able to be converted into a single widget.
 This allows definitions such as the following one:
@@ -74,10 +77,10 @@ public struct VStack: Wrapper, TermKitWidget {
         self.content = content()
     }
 
-    public func container<Storage>(
+    public func container<Data>(
         modifiers: [(any AnyView) -> any AnyView],
-        type: Storage.Type
-    ) -> ViewStorage where Storage: AppStorage {
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
         let storages = content.storages(modifiers: modifiers, type: type) // Get the storages of child views
         if storages.count == 1 {
             return .init(storages[0].pointer, content: [.mainContent: storages])
@@ -94,12 +97,12 @@ public struct VStack: Wrapper, TermKitWidget {
         return .init(view, content: [.mainContent: storages]) // Save storages of child views in the parent's storage for view updates
     }
 
-    public func update<Storage>(
+    public func update<Data>(
         _ storage: ViewStorage,
         modifiers: [(any AnyView) -> any AnyView],
         updateProperties: Bool,
-        type: Storage.Type
-    ) where Storage: AppStorage {
+        type: Data.Type
+    ) where Data: ViewRenderData {
         guard let storages = storage.content[.mainContent] else {
             return
         }
@@ -124,10 +127,26 @@ However, consider the following exceptions:
 - _Always_ update closures (such as the action of a button widget). They may contain reference to state which is updated whenever a view update takes place.
 - _Always_ update bindings. As one can see when looking at ``Binding/init(get:set:)``, they contain two closures which, in most cases, contain a reference to state.
 
+### The Render Data Type
+
+Now, define a view render data type for the main views.
+
+```swift
+public enum MainViewType: ViewRenderData {
+
+    public typealias WidgetType = TermKitWidget
+    public typealias WrapperType = VStack
+
+}
+```
+
+It is possible to have multiple view render data types in one backend for different situations.
+As an example, you could add another type for menus.
+
 ## The App Storage
 
 An app storage object in the app definition determines which backend to use for rendering.
-Therefore, it must contain information about the scene element and widget types, as well as the wrapper widget.
+Therefore, it must contain information about the scene element.
 
 Additionally, the function for executing the app is defined on the object, allowing you to put the setup of the UI into the correct context.
 The quit funtion should terminate the app.
@@ -139,15 +158,10 @@ import TermKit
 public class TermKitApp: AppStorage {
 
     public typealias SceneElementType = TermKitSceneElement
-    public typealias WidgetType = TermKitWidget
-    public typealias WrapperType = VStack
 
-    public var app: () -> any App
     public var storage: StandardAppStorage = .init()
 
-    public required init(id: String, app: @escaping () -> any App) {
-        self.app = app
-    }
+    public required init(id: String) { }
 
     public func run(setup: @escaping () -> Void) {
         Application.prepare()
@@ -165,7 +179,7 @@ public class TermKitApp: AppStorage {
 
 ## Next Steps
 
-Now, you can start implementing scene elements (windows or other "top-level containers"), views, and custom renderable elements.
+Now, you can start implementing scene elements (windows or other "top-level containers"), and views.
 Remember following the instructions for correct updating above for all of the UI element types.
 
 If you still have questions, browse code in the [TermKitBackend repository](https://github.com/david-swift/TermKitBackend) or ask a question in the [discussions](https://github.com/AparokshaUI/Meta/discussions). Feedback on the documentation is appreciated!

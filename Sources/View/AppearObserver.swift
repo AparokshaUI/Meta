@@ -17,10 +17,11 @@ struct AppearObserver: ConvenienceWidget {
     /// - Parameters:
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the app storage.
-    func container<Storage>(
+    /// - Returns: The view storage.
+    func container<Data>(
         modifiers: [(any AnyView) -> any AnyView],
-        type: Storage.Type
-    ) -> ViewStorage where Storage: AppStorage {
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
         let storage = content.storage(modifiers: modifiers, type: type)
         modify(storage)
         return storage
@@ -32,12 +33,12 @@ struct AppearObserver: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
     ///     - type: The type of the app storage.
-    func update<Storage>(
+    func update<Data>(
         _ storage: ViewStorage,
         modifiers: [(any AnyView) -> any AnyView],
         updateProperties: Bool,
-        type: Storage.Type
-    ) where Storage: AppStorage {
+        type: Data.Type
+    ) where Data: ViewRenderData {
         content.updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
     }
 

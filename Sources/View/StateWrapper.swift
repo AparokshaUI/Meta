@@ -36,12 +36,13 @@ struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
-    func update<Storage>(
+    /// - Returns: The view storage.
+    func update<Data>(
         _ storage: ViewStorage,
         modifiers: [(AnyView) -> AnyView],
         updateProperties: Bool,
-        type: Storage.Type
-    ) where Storage: AppStorage {
+        type: Data.Type
+    ) where Data: ViewRenderData {
         var updateProperties = updateProperties
         for property in state {
             if let oldID = storage.state[property.key]?.id {
@@ -64,10 +65,10 @@ struct StateWrapper: ConvenienceWidget {
     ///     - modifiers: Modify views before being updated.
     ///     - type: The type of the app storage.
     /// - Returns: The view storage.
-    func container<Storage>(
+    func container<Data>(
         modifiers: [(AnyView) -> AnyView],
-        type: Storage.Type
-    ) -> ViewStorage where Storage: AppStorage {
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
         let content = content().storage(modifiers: modifiers, type: type)
         let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state

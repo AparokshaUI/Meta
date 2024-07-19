@@ -6,14 +6,14 @@ public enum Backend2 {
     
         public init() { }
     
-        public func container<Storage>(modifiers: [(AnyView) -> AnyView], type: Storage.Type) -> ViewStorage where Storage: AppStorage {
+        public func container<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 2")
             let storage = ViewStorage(nil)
             storage.fields["test"] = 0
             return storage
         }
 
-        public func update<Storage>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Storage.Type) {
+        public func update<Data>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Data.Type) {
             print("Update test widget 2 (#\(storage.fields["test"] ?? ""))")
             storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
         }
@@ -24,14 +24,14 @@ public enum Backend2 {
 
         public init() { }
 
-        public func container<Storage>(modifiers: [(AnyView) -> AnyView], type: Storage.Type) -> ViewStorage where Storage: AppStorage {
+        public func container<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 4")
             let storage = ViewStorage(nil)
             storage.fields["test"] = 0
             return storage
         }
 
-        public func update<Storage>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Storage.Type) {
+        public func update<Data>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Data.Type) {
             print("Update test widget 4 (#\(storage.fields["test"] ?? ""))")
             storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
         }
@@ -46,13 +46,13 @@ public enum Backend2 {
             self.content = content()
         }
 
-        public func container<Storage>(modifiers: [(any Meta.AnyView) -> any Meta.AnyView], type: Storage.Type) -> Meta.ViewStorage where Storage : Meta.AppStorage {
+        public func container<Data>(modifiers: [(any Meta.AnyView) -> any Meta.AnyView], type: Data.Type) -> Meta.ViewStorage where Data: ViewRenderData {
             let storage = ViewStorage(nil)
             storage.content = [.mainContent: content.storages(modifiers: modifiers, type: type)]
             return storage
         }
 
-        public func update<Storage>(_ storage: Meta.ViewStorage, modifiers: [(any Meta.AnyView) -> any Meta.AnyView], updateProperties: Bool, type: Storage.Type) where Storage : Meta.AppStorage {
+        public func update<Data>(_ storage: Meta.ViewStorage, modifiers: [(any Meta.AnyView) -> any Meta.AnyView], updateProperties: Bool, type: Data.Type) where Data: ViewRenderData {
             guard let storages = storage.content[.mainContent] else {
                 return
             }
@@ -68,15 +68,10 @@ public enum Backend2 {
     public class Backend2App: AppStorage {
 
         public typealias SceneElementType = BackendSceneElement
-        public typealias WidgetType = BackendWidget
-        public typealias WrapperType = Wrapper
 
-        public var app: () -> any App
         public var storage: StandardAppStorage = .init()
 
-        public required init(id: String, app: @escaping () -> any App) {
-            self.app = app
-        }
+        public required init(id: String) { }
 
         public func run(setup: @escaping () -> Void) {
             setup()
