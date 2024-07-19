@@ -5,8 +5,6 @@
 //  Created by david-swift on 09.06.24.
 //
 
-import Observation
-
 /// A storage for `@State` properties.
 struct StateWrapper: ConvenienceWidget {
 
@@ -72,24 +70,7 @@ struct StateWrapper: ConvenienceWidget {
         let content = content().storage(modifiers: modifiers, type: type)
         let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state
-        if #available(macOS 14, *), #available(iOS 17, *), state.contains(where: { $0.value.isObservable }) {
-            observe(storage: storage)
-        }
         return storage
-    }
-
-    /// Observe the observable properties accessed in the view.
-    /// - Parameter storage: The view storage
-    @available(macOS, introduced: 14)
-    @available(iOS, introduced: 17)
-    func observe(storage: ViewStorage) {
-        withObservationTracking {
-            _ = content()
-        } onChange: {
-            StateManager.updateState(id: storage.state.first?.value.id ?? .init())
-            StateManager.updateViews()
-            observe(storage: storage)
-        }
     }
 
 }

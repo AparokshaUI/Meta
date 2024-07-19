@@ -12,7 +12,5 @@ protocol StateProtocol {
 
     /// The identifier for the state property's value.
     var id: UUID { get set }
-    /// Whether the state value is an observable object.
-    var isObservable: Bool { get }
 
 }

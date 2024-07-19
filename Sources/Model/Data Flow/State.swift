@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Observation
 
 /// A property wrapper for properties in a view that should be stored throughout view updates.
 @propertyWrapper
@@ -45,15 +44,6 @@ public struct State<Value>: StateProtocol {
         }
         nonmutating set {
             StateManager.setState(id: id, value: newValue)
-        }
-    }
-
-    /// Whether the value is an observable object.
-    var isObservable: Bool {
-        if #available(macOS 14, *), #available(iOS 17, *) {
-            return Value.self as? Observable.Type != nil
-        } else {
-            return false
         }
     }
 

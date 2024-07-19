@@ -5,8 +5,6 @@
 //  Created by david-swift on 01.07.24.
 //
 
-import Observation
-
 /// A structure conforming to `App` is the entry point of your app.
 ///
 /// ```swift
@@ -91,9 +89,6 @@ extension App {
         StateManager.appID = appInstance.id
         let state = appInstance.getState()
         appInstance.app.storage.stateStorage = state
-        if #available(macOS 14, *), #available(iOS 17, *), state.contains(where: { $0.value.isObservable }) {
-            appInstance.observe()
-        }
         return appInstance
     }
 
@@ -105,19 +100,6 @@ extension App {
             }
         }
         return state
-    }
-
-    /// Observe the observable properties accessed in the app.
-    @available(macOS, introduced: 14)
-    @available(iOS, introduced: 17)
-    func observe() {
-        withObservationTracking {
-            _ = scene
-        } onChange: {
-            StateManager.updateState(id: app.storage.stateStorage.first?.value.id ?? .init())
-            StateManager.updateViews()
-            observe()
-        }
     }
 
 }

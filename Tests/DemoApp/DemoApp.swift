@@ -1,11 +1,8 @@
 import Foundation
 @testable import Meta
-import Observation
 import SampleBackends
 
 @main
-@available(macOS 14, *)
-@available(iOS 17, *)
 struct TestExecutable {
 
     public static func main() {
@@ -15,8 +12,6 @@ struct TestExecutable {
 
 }
 
-@available(macOS 14, *)
-@available(iOS 17, *)
 struct DemoApp: App {
 
     let id = "io.github.AparokshaUI.DemoApp"
@@ -34,8 +29,6 @@ struct DemoApp: App {
 
 }
 
-@available(macOS 14, *)
-@available(iOS 17, *)
 struct DemoView: View {
 
     @State private var model = TestModel()
@@ -60,7 +53,6 @@ struct DemoView: View {
 
 }
 
-@available(macOS 14, *)
 struct TestView: View {
 
     @State private var test = TestModel()
@@ -74,10 +66,7 @@ struct TestView: View {
 
 }
 
-@available(macOS 14, *)
-@available(iOS 17, *)
-@Observable
-class TestModel {
+struct TestModel {
 
     var test = "Label"
 
