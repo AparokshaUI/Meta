@@ -60,15 +60,23 @@ struct TestView: View {
     var view: Body {
         Backend2.TestWidget4()
         Backend1.Button(test.test) {
-            test.test = "\(Int.random(in: 1...10))"
+            test.updateAsync()
         }
     }
 
 }
 
-struct TestModel {
+struct TestModel: Model {
 
     var test = "Label"
 
-}
+    var model: ModelData?
 
+    func updateAsync() {
+        Task {
+            // Do something
+            setModel { $0.test = "\(Int.random(in: 1...10))" }
+        }
+    }
+
+}

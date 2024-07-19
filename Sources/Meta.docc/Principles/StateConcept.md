@@ -134,30 +134,41 @@ struct ContentView: View {
 }
 ```
 
-## Observation
+## Organization
 
-State can manage either value types (as seen in the examples above), or [observable reference types](https://developer.apple.com/documentation/observation).
+Instead of having many state variables in one view, you can combine them to one value type if sensible.
 
 ```swift
-@Observable
-class TaskModel {
+struct ContentData {
 
-    var tasks: [String] = []
+    var count = 0
+    var label = "Hello"
 
 }
 
 struct ContentView: View {
 
-    @State private var model = TaskModel()
+    @State private var data = ContentData()
 
     var view: Body {
-        TaskList(tasks: $model.tasks)
+        Button(data.label) { // Directly access properties
+            data.count -= 1 // Directly update properties
+        }
+        IncreaseButton(count: $data.count) // Pass a property as a binding
     }
 
 }
 ```
 
-Observable reference types can be handy when, e.g., synchronizing state with a server.
+### Models
+
+Often when creating complex value types, it is a good idea to provide functions inside of the type manipulating its properties instead of defining them on the views.
+Remember to use the `mutating` keyword to enable the mutation.
+
+In rare cases, you want to update a complex value type in the same way from an asynchronous context.
+As this is not directly possible with value types, a workaround is needed.
+Take a look at the documentation for the ``Model`` for more information,
+but remember that this should only be used when needed.
 
 ## State in Backends
 

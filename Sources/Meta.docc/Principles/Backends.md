@@ -39,11 +39,12 @@ struct Subtasks: App {
 ## Cross-Platform Apps
 
 Even though the backend is set to the TermKitBackend, you can use any view conforming to ``AnyView`` and any scene conforming to ``SceneElement`` in your definition.
-This is enabled by another concept: backends have their own view protocol and their own scene protocol, which conform to ``Widget`` or ``SceneElement``, respectively.
-All the concrete UI elements specific to a backend conform to the backend's protocol.
+This is enabled by another concept: backends have their own view protocols and their own scene protocol, which conform to ``Widget`` or ``SceneElement``, respectively.
+All the concrete UI elements specific to a backend conform to the backend's protocols.
 The conformance to the protocol can therefore be used to identify widgets that should be rendered. If you were to define a platform-independent widget, a so-called convenience widget, make it conform to the ``ConvenienceWidget`` protocol instead, so it will always be rendered.
 
-The app storage of the backend contains the widget and scene element protocols (``AppStorage/WidgetType`` and ``AppStorage/SceneElementType``) which will be used for rendering.
+The app storage of the backend contains the scene element protocols (``AppStorage/SceneElementType``) which will be used for rendering scene elements.
+Pass the correct view render data type (``ViewRenderData``) containing the widget type as well as the default wrapper widget when interacting with child views of scene elements or views.
 
 ## Umbrella Backends
 
