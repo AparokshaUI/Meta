@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://aparokshaui.github.io/meta/">
+  <a href="https://aparokshaui.github.io/Meta/">
   Documentation
   </a>
   ·
@@ -34,7 +34,7 @@ It knows the following layers of UI:
 - A scene element is a template for a container holding one or multiple views (e.g., a window).
 - A view is a part of the actual UI inside a window, or another view.
 
-Detailed information can be found in the [docs](https://aparokshaui.github.io/meta/).
+Detailed information can be found in the [docs](https://aparokshaui.github.io/Meta/).
 
 ## Usage
 
