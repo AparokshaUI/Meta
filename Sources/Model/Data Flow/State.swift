@@ -39,6 +39,7 @@ public struct State<Value>: StateProtocol {
                 let initialValue = getInitialValue()
                 if var model = initialValue as? Model {
                     model.model = .init(id: id, force: forceUpdates)
+                    model.setup()
                     StateManager.setState(id: id, value: model)
                     StateManager.addConstantID(id)
                 } else {

@@ -49,6 +49,11 @@ public protocol Model {
 
     /// Data about the model's state value.
     var model: ModelData? { get set }
+    /// Set the model up.
+    ///
+    /// At the point this function gets called, the model data is available.
+    /// Therefore, you can use it for initializing callbacks of children.
+    mutating func setup()
 
 }
 
@@ -64,13 +69,19 @@ public struct ModelData {
 
 extension Model {
 
+    /// Set the model up.
+    ///
+    /// At the point this function gets called, the model data is available.
+    /// Therefore, you can use it for initializing callbacks of children.
+    mutating func setup() { }
+
     /// Update the model.
     /// - Parameter setModel: Update the model in this closure.
     public func setModel(_ setModel: (inout Self) -> Void) {
         guard let data = model else {
             return
         }
-        var model = self
+        var model = StateManager.getState(id: data.id) as? Self ?? self
         setModel(&model)
         StateManager.setState(id: data.id, value: model)
         StateManager.updateState(id: data.id)
