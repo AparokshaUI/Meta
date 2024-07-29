@@ -81,11 +81,23 @@ extension Model {
         guard let data = model else {
             return
         }
-        var model = StateManager.getState(id: data.id) as? Self ?? self
+        var model = getModel()
         setModel(&model)
         StateManager.setState(id: data.id, value: model)
         StateManager.updateState(id: data.id)
         StateManager.updateViews(force: data.force)
+    }
+
+    /// Get the current version of the model.
+    /// - Returns: The model.
+    ///
+    /// This is only useful when calling from a context where the model itself is outdated.
+    /// Otherwise, directly call the properties.
+    public func getModel() -> Self {
+        guard let data = model else {
+            return self
+        }
+        return StateManager.getState(id: data.id) as? Self ?? self
     }
 
 }
