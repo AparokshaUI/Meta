@@ -35,7 +35,7 @@ jobs:
       - name: Modify Docs
         run: |
           echo "<script>window.location.href += \"/documentation/meta\"</script>" > docs/index.html;
-          sed -i '' 's/,2px/,10px/g' docs/css/index.038e887c.css
+          sed -i '' 's/,2px/,10px/g' docs/css/index.*.css
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
