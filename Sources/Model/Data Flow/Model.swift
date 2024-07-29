@@ -69,6 +69,20 @@ public struct ModelData {
 
 extension Model {
 
+    /// Get the value as a binding using the `$` prefix.
+    public var binding: Binding<Self> {
+        .init {
+            getModel()
+        } set: { newValue in
+            guard let data = model else {
+                return
+            }
+            StateManager.setState(id: data.id, value: newValue)
+            StateManager.updateState(id: data.id)
+            StateManager.updateViews(force: data.force)
+        }
+    }
+
     /// Set the model up.
     ///
     /// At the point this function gets called, the model data is available.
