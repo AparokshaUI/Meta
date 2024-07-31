@@ -62,7 +62,9 @@ public enum Backend1 {
         public func update<Data>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Data.Type) {
             storage.fields["action"] = action
             if updateProperties {
-                print("Update button (label = \(label))")
+                if (storage.previousState as? Self)?.label != label {
+                    print("Update button (label = \(label))")
+                }
             } else {
                 print("Do not update button (label = \(label))")
             }

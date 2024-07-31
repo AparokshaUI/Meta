@@ -22,6 +22,8 @@ public class SceneStorage {
     public var destroy = false
     /// Show the scene element (including moving into the foreground, if possible).
     public var show: () -> Void
+    /// The previous state of the scene element.
+    public var previousState: SceneElement?
 
     /// The pointer as an opaque pointer, as this may be needed with backends interoperating with C or C++.
     public var opaquePointer: OpaquePointer? {

@@ -18,6 +18,8 @@ public class ViewStorage {
     var state: [String: StateProtocol] = [:]
     /// Various properties of a widget.
     public var fields: [String: Any] = [:]
+    /// The previous state of the widget.
+    public var previousState: Widget?
 
     /// The pointer as an opaque pointer, as this is needed with backends interoperating with C or C++.
     public var opaquePointer: OpaquePointer? {
@@ -35,10 +37,12 @@ public class ViewStorage {
     ///   - content: The view's content for container widgets.
     public init(
         _ pointer: Any?,
-        content: [String: [ViewStorage]] = [:]
+        content: [String: [ViewStorage]] = [:],
+        state: Widget? = nil
     ) {
         self.pointer = pointer
         self.content = content
+        self.previousState = state
     }
 
 }
