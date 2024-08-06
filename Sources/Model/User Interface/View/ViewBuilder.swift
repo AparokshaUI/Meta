@@ -53,6 +53,27 @@ public enum ViewBuilder {
         component
     }
 
+    /// Enables support for `if` statements without an `else`.
+    /// - Parameter component: An optional component.
+    /// - Returns: A nonoptional component.
+    public static func buildOptional(_ component: Component?) -> Component {
+        .element(DummyEitherView(condition: component != nil, view1: buildFinalResult(component ?? .element([]))))
+    }
+
+    /// Enables support for `if`-`else` and `switch` statements.
+    /// - Parameter component: A component.
+    /// - Returns: The component.
+    public static func buildEither(first component: Component) -> Component {
+        .element(DummyEitherView(condition: true, view1: buildFinalResult(component)))
+    }
+
+    /// Enables support for `if`-`else` and `switch` statements.
+    /// - Parameter component: A component.
+    /// - Returns: The component.
+    public static func buildEither(second component: Component) -> Component {
+        .element(DummyEitherView(condition: false, view2: buildFinalResult(component)))
+    }
+
     /// Convert a component to an array of elements.
     /// - Parameter component: The component to convert.
     /// - Returns: The generated array of elements.

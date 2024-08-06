@@ -12,5 +12,7 @@ public protocol ViewRenderData {
     associatedtype WidgetType
     /// The wrapper widget.
     associatedtype WrapperType: Wrapper
+    /// The type replacing dummy either views.
+    associatedtype EitherViewType: EitherView
 
 }

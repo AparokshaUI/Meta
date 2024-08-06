@@ -131,10 +131,26 @@ public enum Backend1 {
 
     }
 
+    public struct EitherView: View, Meta.EitherView {
+
+        var view1: Body
+
+        public var view: Body {
+            view1
+        }
+
+        public init(_ condition: Bool, view1: () -> Body, else view2: () -> Body) {
+            print(Self.self)
+            self.view1 = view1()
+        }
+
+    }
+
     public struct MainViewRenderData: ViewRenderData {
 
         public typealias WidgetType = BackendWidget
         public typealias WrapperType = Wrapper
+        public typealias EitherViewType = EitherView
 
     }
 
