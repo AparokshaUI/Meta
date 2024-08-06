@@ -15,10 +15,13 @@ public protocol AnyView {
 
 extension AnyView {
 
-    func getModified(modifiers: [(AnyView) -> AnyView]) -> AnyView {
+    func getModified<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> AnyView where Data: ViewRenderData {
         var modified: AnyView = self
         for modifier in modifiers {
             modified = modifier(modified)
+        }
+        if let dummy = modified as? DummyEitherView {
+            modified = type.EitherViewType(dummy.condition) { dummy.view1 ?? [] } else: { dummy.view2 ?? [] }
         }
         return modified
     }
@@ -55,19 +58,19 @@ extension AnyView {
     /// - Parameter modifiers: Modify views before being updated.
     /// - Returns: The widget.
     func widget<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> Widget where Data: ViewRenderData {
-        let modified = getModified(modifiers: modifiers)
+        let modified = getModified(modifiers: modifiers, type: type)
         if let peer = modified as? Widget {
             return peer
         }
         if let array = modified as? Body {
             return Data.WrapperType { array }
         }
-        return Data.WrapperType { viewContent.map { $0.getModified(modifiers: modifiers) } }
+        return Data.WrapperType { viewContent.map { $0.getModified(modifiers: modifiers, type: type) } }
     }
 
     /// Whether the view can be rendered in a certain environment.
     func renderable<Data>(type: Data.Type, modifiers: [(AnyView) -> AnyView]) -> Bool where Data: ViewRenderData {
-        let result = getModified(modifiers: modifiers)
+        let result = getModified(modifiers: modifiers, type: type)
         return result as? Data.WidgetType != nil
         || result as? SimpleView != nil
         || result as? View != nil

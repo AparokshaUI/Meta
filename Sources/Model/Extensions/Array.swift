@@ -26,9 +26,7 @@ extension Array: AnyView where Element == AnyView {
         } else {
             var modified = self
             for (index, view) in modified.enumerated() {
-                for modifier in modifiers {
-                    modified[safe: index] = modifier(view)
-                }
+                modified[safe: index] = view.getModified(modifiers: modifiers, type: type)
             }
             return Data.WrapperType { modified }
         }

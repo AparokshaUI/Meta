@@ -33,9 +33,14 @@ struct DemoView: View {
 
     @State private var model = TestModel()
     var app: any AppStorage
+    let condition = false
 
     var view: Body {
-        Backend1.TestWidget1()
+        if condition {
+            Backend1.TestWidget1()
+        } else {
+            Backend1.TestWidget3()
+        }
         Backend1.Button(model.test) {
             Task {
                 app.addSceneElement("main")

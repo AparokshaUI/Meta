@@ -131,10 +131,25 @@ public enum Backend1 {
 
     }
 
+    public struct EitherView: BackendWidget, Meta.EitherView {
+
+        public init(_ condition: Bool, view1: () -> Body, else view2: () -> Body) {
+        }
+
+        public func container<Data>(modifiers: [(any AnyView) -> any AnyView], type: Data.Type) -> ViewStorage where Data : ViewRenderData {
+            .init(nil)
+        }
+
+        public func update<Data>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Data.Type) where Data : ViewRenderData {
+        }
+
+    }
+
     public struct MainViewRenderData: ViewRenderData {
 
         public typealias WidgetType = BackendWidget
         public typealias WrapperType = Wrapper
+        public typealias EitherViewType = EitherView
 
     }
 
