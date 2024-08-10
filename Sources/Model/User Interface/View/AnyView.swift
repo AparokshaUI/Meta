@@ -20,9 +20,6 @@ extension AnyView {
         for modifier in modifiers {
             modified = modifier(modified)
         }
-        if let dummy = modified as? DummyEitherView {
-            modified = type.EitherViewType(dummy.condition) { dummy.view1 ?? [] } else: { dummy.view2 ?? [] }
-        }
         return modified
     }
 
