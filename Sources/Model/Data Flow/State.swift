@@ -55,7 +55,7 @@ public struct State<Value>: StateProtocol {
     }
 
     /// The state's identifier for the stored value.
-    var id: UUID = .init()
+    var id: String
 
     /// Whether to force update the views when the value changes.
     var forceUpdates: Bool
@@ -66,9 +66,11 @@ public struct State<Value>: StateProtocol {
     /// Initialize a property representing a state in the view with an autoclosure.
     /// - Parameters:
     ///     - wrappedValue: The wrapped value.
+    ///     - id: An explicit identifier.
     ///     - forceUpdates: Whether to force update all available views when the property gets modified.
-    public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
+    public init(wrappedValue: @autoclosure @escaping () -> Value, id: String? = nil, forceUpdates: Bool = false) {
         getInitialValue = wrappedValue
+        self.id = id ?? UUID().uuidString
         self.forceUpdates = forceUpdates
     }
 

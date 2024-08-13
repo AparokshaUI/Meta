@@ -11,6 +11,6 @@ import Foundation
 protocol StateProtocol {
 
     /// The identifier for the state property's value.
-    var id: UUID { get set }
+    var id: String { get set }
 
 }

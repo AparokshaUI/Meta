@@ -49,7 +49,6 @@ struct StateWrapper: ConvenienceWidget {
             }
             if StateManager.getUpdateState(id: property.value.id) {
                 updateProperties = true
-                StateManager.updatedState(id: property.value.id)
             }
         }
         guard let storage = storage.content[.mainContent]?.first else {

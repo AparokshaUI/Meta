@@ -69,7 +69,6 @@ extension App {
                 }
                 if StateManager.getUpdateState(id: property.value.id) {
                     updateProperties = true
-                    StateManager.updatedState(id: property.value.id)
                 }
             }
             var removeIndices: [Int] = []

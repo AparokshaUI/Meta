@@ -61,7 +61,7 @@ public protocol Model {
 public struct ModelData {
 
     /// The state value's identifier.
-    var id: UUID
+    var id: String
     /// Whether to force update the views when this value changes.
     var force: Bool
 
