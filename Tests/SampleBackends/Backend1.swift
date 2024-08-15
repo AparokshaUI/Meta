@@ -6,14 +6,14 @@ public enum Backend1 {
 
         public init() { }
 
-        public func container<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 1")
             let storage = ViewStorage(nil)
             storage.fields["test"] = 0
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Data.Type) {
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
             print("Update test widget 1 (#\(storage.fields["test"] ?? ""))")
             storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
         }
@@ -24,14 +24,14 @@ public enum Backend1 {
 
         public init() { }
 
-        public func container<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 3")
             let storage = ViewStorage(nil)
             storage.fields["test"] = 0
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, modifiers: [(AnyView) -> AnyView], updateProperties: Bool, type: Data.Type) {
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
             print("Update test widget 3 (#\(storage.fields["test"] ?? ""))")
             storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
         }
@@ -48,7 +48,7 @@ public enum Backend1 {
             self.action = action
         }
 
-        public func container<Data>(modifiers: [(any AnyView) -> any AnyView], type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init button")
             let storage = ViewStorage(nil)
             Task {
@@ -59,7 +59,7 @@ public enum Backend1 {
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Data.Type) {
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
             storage.fields["action"] = action
             if updateProperties {
                 if (storage.previousState as? Self)?.label != label {
@@ -92,10 +92,12 @@ public enum Backend1 {
 
         public func container<Storage>(app: Storage) -> SceneStorage where Storage: AppStorage {
             print("Show \(id)")
-            let viewStorage = content.storage(modifiers: [], type: MainViewRenderData.self)
-            return .init(id: id, pointer: nil, content: [.mainContent : [viewStorage]]) {
+            let storage = SceneStorage(id: id, pointer: nil) {
                 print("Make visible")
             }
+            let viewStorage = content.storage(data: .init(sceneStorage: storage, appStorage: app), type: MainViewRenderData.self)
+            storage.content[.mainContent] = [viewStorage]
+            return storage
         }
 
         public func update<Storage>(_ storage: SceneStorage, app: Storage, updateProperties: Bool) where Storage: AppStorage {
@@ -103,7 +105,7 @@ public enum Backend1 {
             guard let viewStorage = storage.content[.mainContent]?.first else {
                 return
             }
-            content.updateStorage(viewStorage, modifiers: [], updateProperties: updateProperties, type: MainViewRenderData.self)
+            content.updateStorage(viewStorage, data: .init(sceneStorage: storage, appStorage: app), updateProperties: updateProperties, type: MainViewRenderData.self)
         }
 
     }
@@ -116,17 +118,17 @@ public enum Backend1 {
             self.content = content()
         }
 
-        public func container<Data>(modifiers: [(any Meta.AnyView) -> any Meta.AnyView], type: Data.Type) -> Meta.ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) -> Meta.ViewStorage where Data: ViewRenderData {
             let storage = ViewStorage(nil)
-            storage.content = [.mainContent: content.storages(modifiers: modifiers, type: type)]
+            storage.content = [.mainContent: content.storages(data: data, type: type)]
             return storage
         }
 
-        public func update<Data>(_ storage: Meta.ViewStorage, modifiers: [(any Meta.AnyView) -> any Meta.AnyView], updateProperties: Bool, type: Data.Type) where Data: ViewRenderData {
+        public func update<Data>(_ storage: Meta.ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) where Data: ViewRenderData {
             guard let storages = storage.content[.mainContent] else {
                 return
             }
-            content.update(storages, modifiers: modifiers, updateProperties: updateProperties, type: type)
+            content.update(storages, data: data, updateProperties: updateProperties, type: type)
         }
 
     }
@@ -136,11 +138,11 @@ public enum Backend1 {
         public init(_ condition: Bool, view1: () -> Body, else view2: () -> Body) {
         }
 
-        public func container<Data>(modifiers: [(any AnyView) -> any AnyView], type: Data.Type) -> ViewStorage where Data : ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data : ViewRenderData {
             .init(nil)
         }
 
-        public func update<Data>(_ storage: ViewStorage, modifiers: [(any AnyView) -> any AnyView], updateProperties: Bool, type: Data.Type) where Data : ViewRenderData {
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) where Data : ViewRenderData {
         }
 
     }

@@ -78,10 +78,10 @@ public struct VStack: Wrapper, TermKitWidget {
     }
 
     public func container<Data>(
-        modifiers: [(any AnyView) -> any AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> ViewStorage where Data: ViewRenderData {
-        let storages = content.storages(modifiers: modifiers, type: type) // Get the storages of child views
+        let storages = content.storages(data: data, type: type) // Get the storages of child views
         if storages.count == 1 {
             return .init(storages[0].pointer, content: [.mainContent: storages])
         }
@@ -99,14 +99,14 @@ public struct VStack: Wrapper, TermKitWidget {
 
     public func update<Data>(
         _ storage: ViewStorage,
-        modifiers: [(any AnyView) -> any AnyView],
+        data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
     ) where Data: ViewRenderData {
         guard let storages = storage.content[.mainContent] else {
             return
         }
-        content.update(storages, modifiers: modifiers, updateProperties: updateProperties, type: type) // Update the storages of child views
+        content.update(storages, data: data, updateProperties: updateProperties, type: type) // Update the storages of child views
     }
 
 }
@@ -123,7 +123,7 @@ It indicates that a state variable (see <doc:StateConcept>) of an ancestor view 
 If state doesn't change, it is impossible for the UI to change.
 However, consider the following exceptions:
 
-- _Always_ update view content (using ``AnyView/updateStorage(_:modifiers:updateProperties:type:)`` or ``Swift/Array/storages(modifiers:type:)``). Child views may contain own state.
+- _Always_ update view content (using ``AnyView/updateStorage(_:data:updateProperties:type:)`` or ``Swift/Array/storages(data:type:)``). Child views may contain own state.
 - _Always_ update closures (such as the action of a button widget). They may contain reference to state which is updated whenever a view update takes place.
 - _Always_ update bindings. As one can see when looking at ``Binding/init(get:set:)``, they contain two closures which, in most cases, contain a reference to state.
 

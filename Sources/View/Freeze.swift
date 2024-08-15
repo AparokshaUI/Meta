@@ -15,32 +15,32 @@ struct Freeze: ConvenienceWidget {
 
     /// The view storage.
     /// - Parameters:
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - type: The type of the app storage.
     /// - Returns: The view storage.
     func container<Data>(
-        modifiers: [(any AnyView) -> any AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> ViewStorage where Data: ViewRenderData {
-        content.storage(modifiers: modifiers, type: type)
+        content.storage(data: data, type: type)
     }
 
     /// Update the stored content.
     /// - Parameters:
     ///     - storage: The storage to update.
-    ///     - modifiers: Modify views before being updated
+    ///     - data: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
     ///     - type: The type of the app storage.
     func update<Data>(
         _ storage: ViewStorage,
-        modifiers: [(any AnyView) -> any AnyView],
+        data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
     ) where Data: ViewRenderData {
         guard !freeze else {
             return
         }
-        content.updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
+        content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
 }

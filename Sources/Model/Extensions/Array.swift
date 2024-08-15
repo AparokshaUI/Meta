@@ -14,19 +14,19 @@ extension Array: AnyView where Element == AnyView {
 
     /// Get a widget from a collection of views.
     /// - Parameters:
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - type: The app storage type.
     /// - Returns: A widget.
     public func widget<Data>(
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> Widget where Data: ViewRenderData {
-        if count == 1, let widget = self[safe: 0]?.widget(modifiers: modifiers, type: type) {
+        if count == 1, let widget = self[safe: 0]?.widget(data: data, type: type) {
             return widget
         } else {
             var modified = self
             for (index, view) in modified.enumerated() {
-                modified[safe: index] = view.getModified(modifiers: modifiers, type: type)
+                modified[safe: index] = view.getModified(data: data, type: type)
             }
             return Data.WrapperType { modified }
         }
@@ -35,35 +35,35 @@ extension Array: AnyView where Element == AnyView {
     /// Update a collection of views with a collection of view storages.
     /// - Parameters:
     ///     - storages: The collection of view storages.
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
     public func update<Data>(
         _ storages: [ViewStorage],
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
     ) where Data: ViewRenderData {
-        for (index, element) in filter({ $0.renderable(type: type, modifiers: modifiers) }).enumerated() {
+        for (index, element) in filter({ $0.renderable(type: type, data: data) }).enumerated() {
             if let storage = storages[safe: index] {
                 element
-                    .widget(modifiers: modifiers, type: type)
-                    .updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
+                    .widget(data: data, type: type)
+                    .updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
             }
         }
     }
 
     /// Get the view storages of a collection of views.
     /// - Parameters:
-    ///     - modifiers: Modify views before generating the storages.
+    ///     - data: Modify views before generating the storages.
     ///     - type: The type of the app storage.
     /// - Returns: The storages.
     public func storages<Data>(
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> [ViewStorage] where Data: ViewRenderData {
         compactMap { view in
-            view.renderable(type: type, modifiers: modifiers) ? view.storage(modifiers: modifiers, type: type) : nil
+            view.renderable(type: type, data: data) ? view.storage(data: data, type: type) : nil
         }
     }
 

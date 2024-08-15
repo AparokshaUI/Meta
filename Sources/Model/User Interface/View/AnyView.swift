@@ -15,9 +15,9 @@ public protocol AnyView {
 
 extension AnyView {
 
-    func getModified<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> AnyView where Data: ViewRenderData {
+    func getModified<Data>(data: WidgetData, type: Data.Type) -> AnyView where Data: ViewRenderData {
         var modified: AnyView = self
-        for modifier in modifiers {
+        for modifier in data.modifiers {
             modified = modifier(modified)
         }
         return modified
@@ -26,48 +26,48 @@ extension AnyView {
     /// Update a storage to a view.
     /// - Parameters:
     ///     - storage: The storage.
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
     public func updateStorage<Data>(
         _ storage: ViewStorage,
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
     ) where Data: ViewRenderData {
-        widget(modifiers: modifiers, type: type)
-            .update(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
+        widget(data: data, type: type)
+            .update(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
     /// Get a storage.
     /// - Parameters:
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - type: The widget types.
     /// - Returns: The storage.
     public func storage<Data>(
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> ViewStorage where Data: ViewRenderData {
-        widget(modifiers: modifiers, type: type).container(modifiers: modifiers, type: type)
+        widget(data: data, type: type).container(data: data, type: type)
     }
 
     /// Wrap the view into a widget.
-    /// - Parameter modifiers: Modify views before being updated.
+    /// - Parameter data: Modify views before being updated.
     /// - Returns: The widget.
-    func widget<Data>(modifiers: [(AnyView) -> AnyView], type: Data.Type) -> Widget where Data: ViewRenderData {
-        let modified = getModified(modifiers: modifiers, type: type)
+    func widget<Data>(data: WidgetData, type: Data.Type) -> Widget where Data: ViewRenderData {
+        let modified = getModified(data: data, type: type)
         if let peer = modified as? Widget {
             return peer
         }
         if let array = modified as? Body {
             return Data.WrapperType { array }
         }
-        return Data.WrapperType { viewContent.map { $0.getModified(modifiers: modifiers, type: type) } }
+        return Data.WrapperType { viewContent.map { $0.getModified(data: data, type: type) } }
     }
 
     /// Whether the view can be rendered in a certain environment.
-    func renderable<Data>(type: Data.Type, modifiers: [(AnyView) -> AnyView]) -> Bool where Data: ViewRenderData {
-        let result = getModified(modifiers: modifiers, type: type)
+    func renderable<Data>(type: Data.Type, data: WidgetData) -> Bool where Data: ViewRenderData {
+        let result = getModified(data: data, type: type)
         return result as? Data.WidgetType != nil
         || result as? SimpleView != nil
         || result as? View != nil

@@ -31,13 +31,13 @@ struct StateWrapper: ConvenienceWidget {
     /// Update a view storage.
     /// - Parameters:
     ///     - storage: The view storage.
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
     ///     - type: The type of the app storage.
     /// - Returns: The view storage.
     func update<Data>(
         _ storage: ViewStorage,
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
     ) where Data: ViewRenderData {
@@ -54,19 +54,19 @@ struct StateWrapper: ConvenienceWidget {
         guard let storage = storage.content[.mainContent]?.first else {
             return
         }
-        content().updateStorage(storage, modifiers: modifiers, updateProperties: updateProperties, type: type)
+        content().updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
     /// Get a view storage.
     /// - Parameters:
-    ///     - modifiers: Modify views before being updated.
+    ///     - data: Modify views before being updated.
     ///     - type: The type of the app storage.
     /// - Returns: The view storage.
     func container<Data>(
-        modifiers: [(AnyView) -> AnyView],
+        data: WidgetData,
         type: Data.Type
     ) -> ViewStorage where Data: ViewRenderData {
-        let content = content().storage(modifiers: modifiers, type: type)
+        let content = content().storage(data: data, type: type)
         let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state
         return storage
