@@ -88,7 +88,7 @@ extension Model {
     ///
     /// At the point this function gets called, the model data is available.
     /// Therefore, you can use it for initializing callbacks of children.
-    mutating func setup() { }
+    public mutating func setup() { }
 
     /// Update the model.
     /// - Parameter setModel: Update the model in this closure.
