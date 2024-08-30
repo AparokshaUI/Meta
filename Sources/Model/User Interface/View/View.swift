@@ -27,6 +27,7 @@ public protocol View: AnyView {
 
 }
 
+/// Extend the view type with state.
 extension View {
 
     /// The view's content.
@@ -34,6 +35,8 @@ extension View {
         [StateWrapper(content: { view }, state: getState())]
     }
 
+    /// Get the state from the properties.
+    /// - Returns: The state.
     func getState() -> [String: StateProtocol] {
         var state: [String: StateProtocol] = [:]
         for property in Mirror(reflecting: self).children {

@@ -27,6 +27,7 @@ public protocol SimpleView: AnyView {
 
 }
 
+/// Extend the simple view type without state.
 extension SimpleView {
 
     /// The view's content.

@@ -6,7 +6,7 @@
 //
 
 /// A dummy either view. This will be replaced by the platform-specific either view.
-struct DummyEitherView: Widget {
+struct DummyEitherView: ConvenienceWidget {
 
     /// Whether to present the first view.
     var condition: Bool

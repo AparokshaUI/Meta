@@ -13,8 +13,12 @@ public protocol AnyView {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
+    /// Get the view with modifications applied.
+    /// - Parameters:
+    ///     - data:
     func getModified<Data>(data: WidgetData, type: Data.Type) -> AnyView where Data: ViewRenderData {
         var modified: AnyView = self
         for modifier in data.modifiers {

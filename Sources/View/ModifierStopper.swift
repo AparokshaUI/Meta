@@ -40,6 +40,7 @@ struct ModifierStopper: ConvenienceWidget {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
     /// Remove all of the content data for the wrapped views.

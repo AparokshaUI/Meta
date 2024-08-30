@@ -45,6 +45,7 @@ struct Freeze: ConvenienceWidget {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
     /// Prevent a view from being updated.

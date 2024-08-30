@@ -112,6 +112,7 @@ public struct Binding<Value> {
 
 }
 
+/// Extend bindings.
 extension Binding where Value: MutableCollection {
 
     /// Get a child at a certain index of the array as a binding.
@@ -134,6 +135,7 @@ extension Binding where Value: MutableCollection {
 
 }
 
+/// Extend bindings.
 extension Binding where Value: MutableCollection, Value.Element: Identifiable {
 
     /// Get a child of the array with a certain id as a binding.
@@ -147,6 +149,7 @@ extension Binding where Value: MutableCollection, Value.Element: Identifiable {
 
 }
 
+/// Extend bindings.
 extension Binding: CustomStringConvertible where Value: CustomStringConvertible {
 
     /// A textual description of the wrapped value.

@@ -44,6 +44,7 @@ struct AppearObserver: ConvenienceWidget {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
     /// Run a function on the widget when it appears for the first time.

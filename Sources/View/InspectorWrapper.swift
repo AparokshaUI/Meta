@@ -45,6 +45,7 @@ struct InspectorWrapper: ConvenienceWidget {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
     /// Run a custom code accessing the view's storage when initializing and updating the view.

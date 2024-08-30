@@ -36,6 +36,7 @@ public protocol Widget: AnyView {
 
 }
 
+/// Extend the widget type.
 extension Widget {
 
     /// A widget's view is empty.

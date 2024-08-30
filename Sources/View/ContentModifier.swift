@@ -58,6 +58,7 @@ struct ContentModifier<Content>: ConvenienceWidget where Content: AnyView {
 
 }
 
+/// Extend any view.
 extension AnyView {
 
     /// Replace every occurrence of a certain view type in the content.

@@ -40,6 +40,7 @@ public protocol App {
 
 }
 
+/// Extend the app.
 extension App {
 
     /// The application's entry point.
@@ -91,6 +92,8 @@ extension App {
         return appInstance
     }
 
+    /// Get the state from the properties.
+    /// - Returns: The state.
     func getState() -> [String: StateProtocol] {
         var state: [String: StateProtocol] = [:]
         for property in Mirror(reflecting: self).children {

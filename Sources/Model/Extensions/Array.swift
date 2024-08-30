@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Extend arrays.
 extension Array: AnyView where Element == AnyView {
 
     /// The array's view body is the array itself.
@@ -69,6 +70,7 @@ extension Array: AnyView where Element == AnyView {
 
 }
 
+/// Extend arrays.
 extension Array {
 
     /// Accesses the element at the specified position safely.
@@ -96,6 +98,7 @@ extension Array {
 
 }
 
+/// Extend arrays.
 extension Array where Element: Identifiable {
 
     /// Accesses the element with a certain id safely.

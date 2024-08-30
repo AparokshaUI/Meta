@@ -67,6 +67,7 @@ public struct ModelData {
 
 }
 
+/// Extend the model.
 extension Model {
 
     /// Get the value as a binding using the `$` prefix.

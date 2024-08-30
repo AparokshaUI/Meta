@@ -27,6 +27,7 @@ public protocol AppStorage: AnyObject {
 
 }
 
+/// Extend the app storage.
 extension AppStorage {
 
     /// Focus the scene element with a certain id (if supported). Create the element if it doesn't already exist.
