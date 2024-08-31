@@ -61,7 +61,7 @@ public protocol Model {
 public struct ModelData {
 
     /// The state value's identifier.
-    var id: String
+    var storage: StateContent.Storage
     /// Whether to force update the views when this value changes.
     var force: Bool
 
@@ -78,8 +78,8 @@ extension Model {
             guard let data = model else {
                 return
             }
-            StateManager.setState(id: data.id, value: newValue)
-            StateManager.updateState(id: data.id)
+            data.storage.value = newValue
+            data.storage.update = true
             StateManager.updateViews(force: data.force)
         }
     }
@@ -98,8 +98,8 @@ extension Model {
         }
         var model = getModel()
         setModel(&model)
-        StateManager.setState(id: data.id, value: model)
-        StateManager.updateState(id: data.id)
+        data.storage.value = model
+        data.storage.update = true
         StateManager.updateViews(force: data.force)
     }
 
@@ -112,7 +112,7 @@ extension Model {
         guard let data = model else {
             return self
         }
-        return StateManager.getState(id: data.id) as? Self ?? self
+        return data.storage.value as? Self ?? self
     }
 
 }
