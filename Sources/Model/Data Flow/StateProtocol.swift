@@ -10,7 +10,7 @@ import Foundation
 /// An interface for accessing `State` without specifying the generic type.
 protocol StateProtocol {
 
-    /// The identifier for the state property's value.
-    var id: String { get set }
+    /// The state content.
+    var content: StateContent { get }
 
 }

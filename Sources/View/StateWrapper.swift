@@ -43,12 +43,12 @@ struct StateWrapper: ConvenienceWidget {
     ) where Data: ViewRenderData {
         var updateProperties = updateProperties
         for property in state {
-            if let oldID = storage.state[property.key]?.id {
-                StateManager.changeID(old: oldID, new: property.value.id)
-                storage.state[property.key]?.id = property.value.id
+            if let storage = storage.state[property.key]?.content.storage {
+                property.value.content.storage = storage
             }
-            if StateManager.getUpdateState(id: property.value.id) {
+            if property.value.content.update {
                 updateProperties = true
+                property.value.content.update = false
             }
         }
         guard let storage = storage.content[.mainContent]?.first else {

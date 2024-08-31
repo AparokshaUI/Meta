@@ -18,7 +18,7 @@ public struct State<Value>: StateProtocol {
         }
         nonmutating set {
             rawValue = newValue
-            StateManager.updateState(id: id)
+            content.update = true
             StateManager.updateViews(force: forceUpdates)
         }
     }
@@ -35,27 +35,25 @@ public struct State<Value>: StateProtocol {
     /// Get and set the value without updating the views.
     public var rawValue: Value {
         get {
-            guard let value = StateManager.getState(id: id) as? Value else {
+            guard let value = content.value as? Value else {
                 let initialValue = getInitialValue()
+                let storage = StateContent.Storage(value: initialValue)
                 if var model = initialValue as? Model {
-                    model.model = .init(id: id, force: forceUpdates)
+                    model.model = .init(storage: storage, force: forceUpdates)
                     model.setup()
-                    StateManager.setState(id: id, value: model)
-                    StateManager.addConstantID(id)
+                    content.storage = storage
+                    content.value = model
                 } else {
-                    StateManager.setState(id: id, value: initialValue)
+                    content.storage = storage
                 }
                 return initialValue
             }
             return value
         }
         nonmutating set {
-            StateManager.setState(id: id, value: newValue)
+            content.value = newValue
         }
     }
-
-    /// The state's identifier for the stored value.
-    var id: String
 
     /// Whether to force update the views when the value changes.
     var forceUpdates: Bool
@@ -63,14 +61,16 @@ public struct State<Value>: StateProtocol {
     /// The closure for initializing the state property's value.
     var getInitialValue: () -> Value
 
+    /// The content.
+    let content: StateContent = .init()
+
     /// Initialize a property representing a state in the view with an autoclosure.
     /// - Parameters:
     ///     - wrappedValue: The wrapped value.
     ///     - id: An explicit identifier.
     ///     - forceUpdates: Whether to force update all available views when the property gets modified.
-    public init(wrappedValue: @autoclosure @escaping () -> Value, id: String? = nil, forceUpdates: Bool = false) {
+    public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
         getInitialValue = wrappedValue
-        self.id = id ?? UUID().uuidString
         self.forceUpdates = forceUpdates
     }
 

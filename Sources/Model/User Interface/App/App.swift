@@ -62,16 +62,7 @@ extension App {
         appInstance.app = Storage(id: appInstance.id)
         appInstance.app.storage.app = { appInstance }
         StateManager.addUpdateHandler { force in
-            var updateProperties = force
-            for property in appInstance.getState() {
-                if let oldID = appInstance.app.storage.stateStorage[property.key]?.id {
-                    StateManager.changeID(old: oldID, new: property.value.id)
-                    appInstance.app.storage.stateStorage[property.key]?.id = property.value.id
-                }
-                if StateManager.getUpdateState(id: property.value.id) {
-                    updateProperties = true
-                }
-            }
+            let updateProperties = force || appInstance.getState().contains { $0.value.content.update }
             var removeIndices: [Int] = []
             for (index, element) in appInstance.app.storage.sceneStorage.enumerated() {
                 if element.destroy {
