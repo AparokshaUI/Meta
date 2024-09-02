@@ -16,7 +16,7 @@ struct InspectorWrapper: ConvenienceWidget {
     /// The view storage.
     /// - Parameters:
     ///     - data: Modify views before being updated.
-    ///     - type: The type of the app storage.
+    ///     - type: The view render data type.
     /// - Returns: The view storage.
     func container<Data>(
         data: WidgetData,
@@ -32,7 +32,7 @@ struct InspectorWrapper: ConvenienceWidget {
     ///     - storage: The storage to update.
     ///     - data: Modify views before being updated
     ///     - updateProperties: Whether to update the view's properties.
-    ///     - type: The type of the app storage.
+    ///     - type: The view render data type.
     func update<Data>(
         _ storage: ViewStorage,
         data: WidgetData,

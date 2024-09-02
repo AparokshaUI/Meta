@@ -38,7 +38,7 @@ extension Array: AnyView where Element == AnyView {
     ///     - storages: The collection of view storages.
     ///     - data: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    ///     - type: The type of the app storage.
+    ///     - type: The view render data type.
     public func update<Data>(
         _ storages: [ViewStorage],
         data: WidgetData,
@@ -57,7 +57,7 @@ extension Array: AnyView where Element == AnyView {
     /// Get the view storages of a collection of views.
     /// - Parameters:
     ///     - data: Modify views before generating the storages.
-    ///     - type: The type of the app storage.
+    ///     - type: The view render data type.
     /// - Returns: The storages.
     public func storages<Data>(
         data: WidgetData,

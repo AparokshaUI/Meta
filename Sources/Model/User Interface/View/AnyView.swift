@@ -32,7 +32,7 @@ extension AnyView {
     ///     - storage: The storage.
     ///     - data: Modify views before being updated.
     ///     - updateProperties: Whether to update properties.
-    ///     - type: The type of the app storage.
+    ///     - type: The view render data type.
     public func updateStorage<Data>(
         _ storage: ViewStorage,
         data: WidgetData,

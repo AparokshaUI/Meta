@@ -70,7 +70,7 @@ public struct ModelData {
 /// Extend the model.
 extension Model {
 
-    /// Get the value as a binding using the `$` prefix.
+    /// Get the value as a binding.
     public var binding: Binding<Self> {
         .init {
             getModel()
