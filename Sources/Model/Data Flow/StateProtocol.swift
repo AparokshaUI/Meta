@@ -12,5 +12,7 @@ protocol StateProtocol {
 
     /// The state content.
     var content: StateContent { get }
+    /// Set the storage up.
+    func setup()
 
 }

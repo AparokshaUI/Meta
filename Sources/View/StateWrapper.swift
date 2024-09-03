@@ -69,6 +69,9 @@ struct StateWrapper: ConvenienceWidget {
         let content = content().storage(data: data, type: type)
         let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
         storage.state = state
+        for element in state {
+            element.value.setup()
+        }
         return storage
     }
 

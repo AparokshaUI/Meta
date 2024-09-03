@@ -36,24 +36,11 @@ public struct State<Value>: StateProtocol {
     public var rawValue: Value {
         get {
             guard let value = content.value as? Value else {
-                let initialValue = getInitialValue()
-                let storage = StateContent.Storage(value: initialValue)
-                if var model = initialValue as? Model {
-                    model.model = .init(storage: storage, force: forceUpdates)
-                    model.setup()
-                    content.storage = storage
-                    content.value = model
-                } else {
-                    content.storage = storage
-                }
-                return initialValue
+                return initialValue()
             }
             return value
         }
         nonmutating set {
-            if content.storage == nil {
-                _ = rawValue
-            }
             content.value = newValue
         }
     }
@@ -75,6 +62,27 @@ public struct State<Value>: StateProtocol {
     public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
         getInitialValue = wrappedValue
         self.forceUpdates = forceUpdates
+    }
+
+    /// Get the initial value.
+    /// - Returns: The initial value.
+    func initialValue() -> Value {
+        let initialValue = getInitialValue()
+        let storage = StateContent.Storage(value: initialValue)
+        if var model = initialValue as? Model {
+            model.model = .init(storage: storage, force: forceUpdates)
+            model.setup()
+            content.storage = storage
+            content.value = model
+        } else {
+            content.storage = storage
+        }
+        return initialValue
+    }
+
+    /// Set the storage up.
+    func setup() {
+        _ = initialValue()
     }
 
 }
