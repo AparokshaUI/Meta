@@ -51,6 +51,9 @@ public struct State<Value>: StateProtocol {
             return value
         }
         nonmutating set {
+            if content.storage == nil {
+                _ = rawValue
+            }
             content.value = newValue
         }
     }
