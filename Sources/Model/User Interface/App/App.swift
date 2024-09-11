@@ -47,7 +47,7 @@ extension App {
     public static func main() {
         let app = setupApp()
         app.app.run {
-            for element in app.scene where element as? Storage.SceneElementType != nil {
+            for element in app.scene where element is Storage.SceneElementType {
                 element.setupInitialContainers(app: app.app)
             }
         }

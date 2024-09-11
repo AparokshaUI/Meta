@@ -40,14 +40,15 @@ public enum Backend1 {
 
     public struct Button: BackendWidget {
 
-        var label: String
-        var action: () -> Void
+        @Property(set: { _, label in print("Update button (label = \(label))") })
+        var label = ""
+        @Property(set: { storage, closure in storage.fields["action"] = closure })
+        var action: () -> Void = { }
 
         public init(_ label: String, action: @escaping () -> Void) {
             self.label = label
             self.action = action
         }
-
         public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
             print("Init button")
             let storage = ViewStorage(nil)
@@ -56,18 +57,8 @@ public enum Backend1 {
                 (storage.fields["action"] as? () -> Void)?()
             }
             storage.fields["action"] = action
+            storage.previousState = self
             return storage
-        }
-
-        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-            storage.fields["action"] = action
-            if updateProperties {
-                if (storage.previousState as? Self)?.label != label {
-                    print("Update button (label = \(label))")
-                }
-            } else {
-                print("Do not update button (label = \(label))")
-            }
         }
 
     }

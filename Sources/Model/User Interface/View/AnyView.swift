@@ -72,11 +72,11 @@ extension AnyView {
     /// Whether the view can be rendered in a certain environment.
     func renderable<Data>(type: Data.Type, data: WidgetData) -> Bool where Data: ViewRenderData {
         let result = getModified(data: data, type: type)
-        return result as? Data.WidgetType != nil
-        || result as? SimpleView != nil
-        || result as? View != nil
-        || result as? ConvenienceWidget != nil
-        || result as? Body != nil
+        return result is Data.WidgetType
+        || result is SimpleView
+        || result is View
+        || result is ConvenienceWidget
+        || result is Body
     }
 
     /// Apply a modification onto a view.
