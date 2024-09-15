@@ -41,9 +41,11 @@ struct DemoView: View {
         } else {
             Backend1.TestWidget3()
         }
-        Backend1.Button(model.test) {
-            Task {
-                app.addSceneElement("main")
+        Backend1.Wrapper {
+            Backend1.Button(model.test) {
+                Task {
+                    app.addSceneElement("main")
+                }
             }
         }
         TestView()

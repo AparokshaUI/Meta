@@ -58,6 +58,33 @@ public struct Property<Value, Pointer>: PropertyProtocol {
 
 }
 
+/// Assign an updating closure to a widget's property.
+///
+/// This will be used if you do not provide a custom ``Widget/update(_:data:updateProperties:type:)`` method
+/// or call the ``Widget/updateProperties(_:updateProperties:)`` method in your custom update method.
+@propertyWrapper
+public struct ViewProperty<Pointer, ViewPointer>: ViewPropertyProtocol {
+
+    /// The wrapped value.
+    public var wrappedValue: Body = []
+    /// Set the view.
+    var setView: (Pointer, ViewPointer) -> Void
+
+    /// Initialize a property.
+    /// - Parameters:
+    ///     - setView: Set the view.
+    ///     - pointer: The pointer type of the parent view (usually a concrete view type).
+    ///     - subview: The pointer type of the child view (usually a protocol, view class, or similar).
+    public init(
+        set setView: @escaping (Pointer, ViewPointer) -> Void,
+        pointer: Pointer.Type,
+        subview: ViewPointer.Type
+    ) {
+        self.setView = setView
+    }
+
+}
+
 extension Property where Value: OptionalProtocol {
 
     /// Initialize a property.
@@ -116,6 +143,23 @@ protocol PropertyProtocol {
 
 }
 
+/// The view property protocol.
+///
+/// Do not use for wrapper widgets.
+protocol ViewPropertyProtocol {
+
+    /// The type of the view's pointer.
+    associatedtype Pointer
+    /// The type of the view's content.
+    associatedtype ViewPointer
+
+    /// The wrapped value.
+    var wrappedValue: Body { get }
+    /// Set the view.
+    var setView: (Pointer, ViewPointer) -> Void { get }
+
+}
+
 /// The update strategy for properties.
 public enum UpdateStrategy {
 
@@ -140,20 +184,67 @@ extension Widget {
     ///     - type: The view render data type.
     ///
     /// This is the default implementation which requires the usage of ``Property``.
-    public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-        self.updateProperties(storage, updateProperties: updateProperties)
+    public func update<Data>(
+        _ storage: ViewStorage,
+        data: WidgetData,
+        updateProperties: Bool,
+        type: Data.Type
+    ) where Data: ViewRenderData {
+        self.updateProperties(storage, data: data, updateProperties: updateProperties, type: type)
         if updateProperties {
             storage.previousState = self
+        }
+    }
+
+    /// Initialize the properties wrapped with ``Property``.
+    /// - Parameters:
+    ///     - storage: The view storage.
+    ///     - data: Modify views before being updated.
+    ///     - type: The view render data type.
+    public func initProperties<Data>(
+        _ storage: ViewStorage,
+        data: WidgetData,
+        type: Data.Type
+    ) where Data: ViewRenderData {
+        let mirror = Mirror(reflecting: self)
+        for property in mirror.children {
+            if let value = property.value as? any ViewPropertyProtocol {
+                let subview = value.wrappedValue.storage(data: data, type: type)
+                initViewProperty(value, view: subview, parent: storage)
+                storage.content[property.label ?? .mainContent] = [subview]
+            }
+        }
+    }
+
+    /// Initialize the properties wrapped with ``ViewProperty``.
+    /// - Parameters:
+    ///     - value: The property.
+    ///     - view: The subview's view storage.
+    ///     - parent: The parent's view storage.
+    func initViewProperty<Property>(
+        _ value: Property,
+        view: ViewStorage,
+        parent: ViewStorage
+    ) where Property: ViewPropertyProtocol {
+        if let view = view.pointer as? Property.ViewPointer, let pointer = parent.pointer as? Property.Pointer {
+            value.setView(pointer, view)
         }
     }
 
     /// Update the properties wrapped with ``Property``.
     /// - Parameters:
     ///     - storage: The storage to update.
+    ///     - data: The widget data.
     ///     - updateProperties: Whether to update the view's properties.
-    public func updateProperties(_ storage: ViewStorage, updateProperties: Bool) {
+    ///     - type: The view render data type.
+    public func updateProperties<Data>(
+        _ storage: ViewStorage,
+        data: WidgetData,
+        updateProperties: Bool,
+        type: Data.Type
+    ) where Data: ViewRenderData {
         let mirror = Mirror(reflecting: self)
-        updateNotEquatable(mirror: mirror, storage: storage)
+        updateNotEquatable(mirror: mirror, storage: storage, data: data, updateProperties: updateProperties, type: type)
         guard updateProperties else {
             return
         }
@@ -165,13 +256,26 @@ extension Widget {
     /// - Parameters:
     ///     - mirror: A mirror of the widget.
     ///     - storage: The view storage.
-    func updateNotEquatable(mirror: Mirror, storage: ViewStorage) {
+    ///     - data: The widget data.
+    ///     - updateProperties: Whether to update the properties.
+    ///     - type: The view render data type.
+    func updateNotEquatable<Data>(
+        mirror: Mirror,
+        storage: ViewStorage,
+        data: WidgetData,
+        updateProperties: Bool,
+        type: Data.Type
+    ) where Data: ViewRenderData {
         for property in mirror.children {
             if let value = property.value as? any PropertyProtocol {
                 if value.updateStrategy == .always ||
                 value.wrappedValue as? any Equatable == nil && value.updateStrategy != .alwaysWhenStateUpdate {
                     setProperty(property: value, storage: storage)
                 }
+            }
+            if let value = property.value as? any ViewPropertyProtocol,
+               let storage = storage.content[property.label ?? .mainContent]?.first {
+               value.wrappedValue.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
             }
         }
     }
