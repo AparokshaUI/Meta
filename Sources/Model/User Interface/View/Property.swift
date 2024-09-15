@@ -13,7 +13,7 @@
 public struct Property<Value, Pointer>: PropertyProtocol {
 
     /// The function applying the property to the UI.
-    public var setProperty: (Pointer?, Value, ViewStorage) -> Void
+    public var setProperty: (Pointer, Value, ViewStorage) -> Void
     /// The wrapped value.
     public var wrappedValue: Value
     /// The update strategy.
@@ -27,7 +27,7 @@ public struct Property<Value, Pointer>: PropertyProtocol {
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
         wrappedValue: Value,
-        set setProperty: @escaping (Pointer?, Value, ViewStorage) -> Void,
+        set setProperty: @escaping (Pointer, Value, ViewStorage) -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
@@ -44,7 +44,7 @@ public struct Property<Value, Pointer>: PropertyProtocol {
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
         wrappedValue: Value,
-        set setProperty: @escaping (Pointer?, Value) -> Void,
+        set setProperty: @escaping (Pointer, Value) -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
@@ -66,7 +66,7 @@ extension Property where Value: OptionalProtocol {
     ///     - pointer: The type of the pointer.
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
-        set setProperty: @escaping (Pointer?, Value.Wrapped, ViewStorage) -> Void,
+        set setProperty: @escaping (Pointer, Value.Wrapped, ViewStorage) -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
@@ -86,7 +86,7 @@ extension Property where Value: OptionalProtocol {
     ///     - pointer: The type of the pointer.
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
-        set setProperty: @escaping (Pointer?, Value.Wrapped) -> Void,
+        set setProperty: @escaping (Pointer, Value.Wrapped) -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
@@ -110,7 +110,7 @@ protocol PropertyProtocol {
     /// The wrapped value.
     var wrappedValue: Value { get }
     /// Set the property.
-    var setProperty: (Pointer?, Value, ViewStorage) -> Void { get }
+    var setProperty: (Pointer, Value, ViewStorage) -> Void { get }
     /// The update strategy.
     var updateStrategy: UpdateStrategy { get }
 
@@ -244,7 +244,9 @@ extension Widget {
         if let optional = property.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
             return
         }
-        property.setProperty(storage.pointer as? Property.Pointer, property.wrappedValue, storage)
+        if let pointer = storage.pointer as? Property.Pointer {
+            property.setProperty(pointer, property.wrappedValue, storage)
+        }
     }
 
 }
