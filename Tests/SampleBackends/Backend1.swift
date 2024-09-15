@@ -40,9 +40,9 @@ public enum Backend1 {
 
     public struct Button: BackendWidget {
 
-        @Property(set: { _, label in print("Update button (label = \(label))") })
+        @Property(set: { print("Update button (label = \($1))") }, pointer: Any.self)
         var label = ""
-        @Property(set: { storage, closure in storage.fields["action"] = closure })
+        @Property(set: { $2.fields["action"] = $1 }, pointer: Any.self)
         var action: () -> Void = { }
 
         public init(_ label: String, action: @escaping () -> Void) {
