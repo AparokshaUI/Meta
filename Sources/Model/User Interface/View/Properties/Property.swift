@@ -58,33 +58,6 @@ public struct Property<Value, Pointer>: PropertyProtocol {
 
 }
 
-/// Assign an updating closure to a widget's property.
-///
-/// This will be used if you do not provide a custom ``Widget/update(_:data:updateProperties:type:)`` method
-/// or call the ``Widget/updateProperties(_:updateProperties:)`` method in your custom update method.
-@propertyWrapper
-public struct ViewProperty<Pointer, ViewPointer>: ViewPropertyProtocol {
-
-    /// The wrapped value.
-    public var wrappedValue: Body = []
-    /// Set the view.
-    var setView: (Pointer, ViewPointer) -> Void
-
-    /// Initialize a property.
-    /// - Parameters:
-    ///     - setView: Set the view.
-    ///     - pointer: The pointer type of the parent view (usually a concrete view type).
-    ///     - subview: The pointer type of the child view (usually a protocol, view class, or similar).
-    public init(
-        set setView: @escaping (Pointer, ViewPointer) -> Void,
-        pointer: Pointer.Type,
-        subview: ViewPointer.Type
-    ) {
-        self.setView = setView
-    }
-
-}
-
 extension Property where Value: OptionalProtocol {
 
     /// Initialize a property.
@@ -140,23 +113,6 @@ protocol PropertyProtocol {
     var setProperty: (Pointer, Value, ViewStorage) -> Void { get }
     /// The update strategy.
     var updateStrategy: UpdateStrategy { get }
-
-}
-
-/// The view property protocol.
-///
-/// Do not use for wrapper widgets.
-protocol ViewPropertyProtocol {
-
-    /// The type of the view's pointer.
-    associatedtype Pointer
-    /// The type of the view's content.
-    associatedtype ViewPointer
-
-    /// The wrapped value.
-    var wrappedValue: Body { get }
-    /// Set the view.
-    var setView: (Pointer, ViewPointer) -> Void { get }
 
 }
 
@@ -228,6 +184,9 @@ extension Widget {
                 initViewProperty(value, view: subview, parent: storage)
                 storage.content[property.label ?? .mainContent] = [subview]
             }
+            if let value = property.value as? any BindingPropertyProtocol {
+                initBindingProperty(value, parent: storage)
+            }
         }
     }
 
@@ -243,6 +202,16 @@ extension Widget {
     ) where Property: ViewPropertyProtocol {
         if let view = view.pointer as? Property.ViewPointer, let pointer = parent.pointer as? Property.Pointer {
             value.setView(pointer, view)
+        }
+    }
+
+    /// Initialize a binding property.
+    /// - Parameters:
+    ///     - value: The property.
+    ///     - parent: The view storage.
+    func initBindingProperty<Property>(_ value: Property, parent: ViewStorage) where Property: BindingPropertyProtocol {
+        if let view = parent.pointer as? Property.Pointer {
+            value.observe(view, value.wrappedValue, parent)
         }
     }
 
@@ -291,6 +260,9 @@ extension Widget {
             if let value = property.value as? any ViewPropertyProtocol,
                let storage = storage.content[property.label ?? .mainContent]?.first {
                value.wrappedValue.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+            }
+            if let value = property.value as? any BindingPropertyProtocol {
+                setBindingProperty(property: value, storage: storage)
             }
         }
     }
@@ -365,6 +337,22 @@ extension Widget {
         }
         if let pointer = storage.pointer as? Property.Pointer {
             property.setProperty(pointer, property.wrappedValue, storage)
+        }
+    }
+
+    /// Apply a binding property to the framework.
+    /// - Parameters:
+    ///     - property: The property.
+    ///     - storage: The view storage.
+    func setBindingProperty<Property>(
+        property: Property,
+        storage: ViewStorage
+    ) where Property: BindingPropertyProtocol {
+        if let optional = property.wrappedValue.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
+            return
+        }
+        if let pointer = storage.pointer as? Property.Pointer {
+            property.setValue(pointer, property.wrappedValue.wrappedValue, storage)
         }
     }
 
