@@ -176,6 +176,21 @@ public enum UpdateStrategy {
 
 extension Widget {
 
+    /// The view storage.
+    /// - Parameters:
+    ///     - data: Modify views before being updated.
+    ///     - type: The view render data type.
+    /// - Returns: The view storage.
+    public func container<Data>(
+        data: WidgetData,
+        type: Data.Type
+    ) -> ViewStorage where Data: ViewRenderData {
+        let storage = ViewStorage(initializeWidget())
+        initProperties(storage, data: data, type: type)
+        update(storage, data: data, updateProperties: true, type: type)
+        return storage
+    }
+
     /// Update the stored content.
     /// - Parameters:
     ///     - storage: The storage to update.

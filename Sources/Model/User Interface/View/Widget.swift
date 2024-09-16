@@ -34,6 +34,13 @@ public protocol Widget: AnyView {
         type: Data.Type
     ) where Data: ViewRenderData
 
+    /// Get the widget.
+    /// - Returns: The widget.
+    ///
+    /// Define this function only if you do not define ``Widget/container(data:type:)``.
+    /// Otherwise, it will not have an effect.
+    func initializeWidget() -> Any
+
 }
 
 /// Extend the widget type.
@@ -41,5 +48,12 @@ extension Widget {
 
     /// A widget's view is empty.
     public var viewContent: Body { [] }
+
+    /// Print a warning if the widget does not set this function but it gets accessed.
+    /// - Returns: A dummy pointer.
+    public func initializeWidget() -> Any {
+        print("Warning: Define initialize widget function or container function for \(Self.self)")
+        return ""
+    }
 
 }
