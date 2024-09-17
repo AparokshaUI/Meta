@@ -211,7 +211,18 @@ extension Widget {
     ///     - parent: The view storage.
     func initBindingProperty<Property>(_ value: Property, parent: ViewStorage) where Property: BindingPropertyProtocol {
         if let view = parent.pointer as? Property.Pointer {
-            value.observe(view, value.wrappedValue, parent)
+            value.observe(
+                view,
+                .init {
+                    value.wrappedValue.wrappedValue
+                } set: { newValue in
+                    if let compareValue = newValue as? any Equatable,
+                    !equal(value.wrappedValue.wrappedValue, compareValue) {
+                        value.wrappedValue.wrappedValue = newValue
+                    }
+                },
+                parent
+            )
         }
     }
 
@@ -321,8 +332,20 @@ extension Widget {
         _ property: Property,
         _ value: Value
     ) -> Bool where Property: PropertyProtocol, Value: Equatable {
-        if let propertyValue = property.wrappedValue as? Value {
-            return propertyValue == value
+        equal(property.wrappedValue, value)
+    }
+
+    /// Check whether a value is equal to another value.
+    /// - Parameters:
+    ///     - value1: The first value.
+    ///     - value2: The second value.
+    /// - Returns: Whether the values are equal.
+    func equal<Value1, Value2>(
+        _ value1: Value1,
+        _ value2: Value2
+    ) -> Bool where Value2: Equatable {
+        if let value1 = value1 as? Value2 {
+            return value1 == value2
         }
         return false
     }
@@ -337,22 +360,6 @@ extension Widget {
         }
         if let pointer = storage.pointer as? Property.Pointer {
             property.setProperty(pointer, property.wrappedValue, storage)
-        }
-    }
-
-    /// Apply a binding property to the framework.
-    /// - Parameters:
-    ///     - property: The property.
-    ///     - storage: The view storage.
-    func setBindingProperty<Property>(
-        property: Property,
-        storage: ViewStorage
-    ) where Property: BindingPropertyProtocol {
-        if let optional = property.wrappedValue.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
-            return
-        }
-        if let pointer = storage.pointer as? Property.Pointer {
-            property.setValue(pointer, property.wrappedValue.wrappedValue, storage)
         }
     }
 

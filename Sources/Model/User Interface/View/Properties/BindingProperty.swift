@@ -74,3 +74,23 @@ protocol BindingPropertyProtocol {
     var setValue: (Pointer, Value, ViewStorage) -> Void { get }
 
 }
+
+extension Widget {
+
+    /// Apply a binding property to the framework.
+    /// - Parameters:
+    ///     - property: The property.
+    ///     - storage: The view storage.
+    func setBindingProperty<Property>(
+        property: Property,
+        storage: ViewStorage
+    ) where Property: BindingPropertyProtocol {
+        if let optional = property.wrappedValue.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
+            return
+        }
+        if let pointer = storage.pointer as? Property.Pointer {
+            property.setValue(pointer, property.wrappedValue.wrappedValue, storage)
+        }
+    }
+
+}
