@@ -101,4 +101,10 @@ public actor SceneStorage {
         self.destroy = destroy
     }
 
+    /// Set the closure which shows the scene.
+    /// - Parameter show: The closure.
+    public func setShow(_ show: @Sendable @escaping () -> Void) {
+        self.show = show
+    }
+
 }
