@@ -8,7 +8,7 @@
 import Foundation
 
 /// A type that signalizes an action.
-public struct Signal {
+public struct Signal: Sendable {
 
     /// An action is signalized by toggling a boolean to `true` and back to `false`.
     @State var boolean = false
