@@ -55,6 +55,12 @@ struct StateWrapper: ConvenienceWidget {
             return
         }
         await content().updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+        for property in state {
+            if var value = property.value.content.value as? Signal, value.update {
+                value.destroySignal()
+                property.value.content.value = value
+            }
+        }
     }
 
     /// Get a view storage.
