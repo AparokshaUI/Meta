@@ -9,7 +9,7 @@
 struct InspectorWrapper: ConvenienceWidget {
 
     /// The custom code to edit the widget.
-    var modify: @Sendable (ViewStorage, Bool) -> Void
+    var modify: @Sendable (ViewStorage, Bool) async -> Void
     /// The wrapped view.
     var content: AnyView
 
@@ -23,7 +23,7 @@ struct InspectorWrapper: ConvenienceWidget {
         type: Data.Type
     ) async -> ViewStorage where Data: ViewRenderData {
         let storage = await content.storage(data: data, type: type)
-        modify(storage, true)
+        await modify(storage, true)
         return storage
     }
 
@@ -40,7 +40,7 @@ struct InspectorWrapper: ConvenienceWidget {
         type: Data.Type
     ) async where Data: ViewRenderData {
         await content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
-        modify(storage, updateProperties)
+        await modify(storage, updateProperties)
     }
 
 }
@@ -51,15 +51,15 @@ extension AnyView {
     /// Run a custom code accessing the view's storage when initializing and updating the view.
     /// - Parameter modify: Modify the storage. The boolean indicates whether state in parent views changed.
     /// - Returns: A view.
-    public func inspect(_ modify: @Sendable @escaping (ViewStorage, Bool) -> Void) -> AnyView {
+    public func inspect(_ modify: @Sendable @escaping (ViewStorage, Bool) async -> Void) -> AnyView {
         InspectorWrapper(modify: modify, content: self)
     }
 
     /// Run a function when the view gets updated.
     /// - Parameter onUpdate: The function.
     /// - Returns: A view.
-    public func onUpdate(_ onUpdate: @Sendable @escaping () -> Void) -> AnyView {
-        inspect { _, _ in onUpdate() }
+    public func onUpdate(_ onUpdate: @Sendable @escaping () async -> Void) -> AnyView {
+        inspect { _, _ in await onUpdate() }
     }
 
 }
