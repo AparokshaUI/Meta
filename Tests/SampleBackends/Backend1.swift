@@ -6,16 +6,16 @@ public enum Backend1 {
 
         public init() { }
 
-        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 1")
             let storage = ViewStorage(nil)
-            storage.fields["test"] = 0
+            await storage.setField(key: "test", value: 0)
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-            print("Update test widget 1 (#\(storage.fields["test"] ?? ""))")
-            storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async {
+            print("Update test widget 1 (#\(await storage.getField(key: "test") ?? ""))")
+            await storage.setField(key: "test", value: (storage.getField(key: "test") as? Int ?? 0) + 1)
         }
 
     }
@@ -24,16 +24,16 @@ public enum Backend1 {
 
         public init() { }
 
-        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 3")
             let storage = ViewStorage(nil)
-            storage.fields["test"] = 0
+            await storage.setField(key: "test", value: 0)
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-            print("Update test widget 3 (#\(storage.fields["test"] ?? ""))")
-            storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async {
+            print("Update test widget 3 (#\(await storage.getField(key: "test") ?? ""))")
+            await storage.setField(key: "test", value: (storage.getField(key: "test") as? Int ?? 0) + 1)
         }
 
     }
@@ -42,28 +42,28 @@ public enum Backend1 {
 
         @Property(set: { print("Update button (label = \($1))") }, pointer: Any.self)
         var label = ""
-        @Property(set: { $2.fields["action"] = $1 }, pointer: Any.self)
-        var action: () -> Void = { }
+        @Property(set: { $2.setField(key: "action", value: $1) }, pointer: Any.self)
+        var action: @Sendable () -> Void = { }
 
-        public init(_ label: String, action: @escaping () -> Void) {
+        public init(_ label: String, action: @Sendable @escaping () -> Void) {
             self.label = label
             self.action = action
         }
-        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> ViewStorage where Data: ViewRenderData {
             print("Init button")
             let storage = ViewStorage(nil)
             Task {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
-                (storage.fields["action"] as? () -> Void)?()
+                (await storage.getField(key: "action") as? @Sendable () -> Void)?()
             }
-            storage.fields["action"] = action
-            storage.previousState = self
+            await storage.setField(key: "action", value: action)
+            await storage.setPreviousState(self)
             return storage
         }
 
     }
 
-    public struct Window: BackendSceneElement {
+    public struct Window: BackendSceneElement, Sendable {
 
         public var id: String
         var spawn: Int
@@ -77,7 +77,9 @@ public enum Backend1 {
 
         public func setupInitialContainers<Storage>(app: Storage) where Storage: AppStorage {
             for _ in 0..<spawn {
-                app.storage.sceneStorage.append(container(app: app))
+                Task {
+                    await app.appendScene(container(app: app))
+                }
             }
         }
 
@@ -86,17 +88,21 @@ public enum Backend1 {
             let storage = SceneStorage(id: id, pointer: nil) {
                 print("Make visible")
             }
-            let viewStorage = content.storage(data: .init(sceneStorage: storage, appStorage: app), type: MainViewRenderData.self)
-            storage.content[.mainContent] = [viewStorage]
+            Task {
+                let viewStorage = await content.storage(data: .init(sceneStorage: storage, appStorage: app), type: MainViewRenderData.self)
+                await storage.setContent(key: .mainContent, value: [viewStorage])
+            }
             return storage
         }
 
         public func update<Storage>(_ storage: SceneStorage, app: Storage, updateProperties: Bool) where Storage: AppStorage {
-            print("Update \(id)")
-            guard let viewStorage = storage.content[.mainContent]?.first else {
-                return
+            Task {
+                print("Update \(id)")
+                guard let viewStorage = await storage.getContent(key: .mainContent).first else {
+                    return
+                }
+                await content.updateStorage(viewStorage, data: .init(sceneStorage: storage, appStorage: app), updateProperties: updateProperties, type: MainViewRenderData.self)
             }
-            content.updateStorage(viewStorage, data: .init(sceneStorage: storage, appStorage: app), updateProperties: updateProperties, type: MainViewRenderData.self)
         }
 
     }
@@ -109,17 +115,15 @@ public enum Backend1 {
             self.content = content()
         }
 
-        public func container<Data>(data: WidgetData, type: Data.Type) -> Meta.ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> Meta.ViewStorage where Data: ViewRenderData {
             let storage = ViewStorage(nil)
-            storage.content = [.mainContent: content.storages(data: data, type: type)]
+            await storage.setContent(key: .mainContent, value: content.storages(data: data, type: type))
             return storage
         }
 
-        public func update<Data>(_ storage: Meta.ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) where Data: ViewRenderData {
-            guard let storages = storage.content[.mainContent] else {
-                return
-            }
-            content.update(storages, data: data, updateProperties: updateProperties, type: type)
+        public func update<Data>(_ storage: Meta.ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async where Data: ViewRenderData {
+            let storages = await storage.getContent(key: .mainContent)
+            await content.update(storages, data: data, updateProperties: updateProperties, type: type)
         }
 
     }
@@ -150,19 +154,19 @@ public enum Backend1 {
 
     public protocol BackendSceneElement: SceneElement { }
 
-    public class Backend1App: AppStorage {
+    public actor Backend1App: AppStorage {
 
         public typealias SceneElementType = BackendSceneElement
 
         public var storage: StandardAppStorage = .init()
 
-        public required init(id: String) { }
+        public init(id: String) { }
 
-        public func run(setup: @escaping () -> Void) {
+        nonisolated public func run(setup: @escaping () -> Void) {
             setup()
         }
 
-        public func quit() {
+        nonisolated public func quit() {
             fatalError("Quit")
         }
 

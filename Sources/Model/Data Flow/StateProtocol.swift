@@ -8,7 +8,7 @@
 import Foundation
 
 /// An interface for accessing `State` without specifying the generic type.
-protocol StateProtocol {
+protocol StateProtocol: Sendable {
 
     /// The state content.
     var content: StateContent { get }

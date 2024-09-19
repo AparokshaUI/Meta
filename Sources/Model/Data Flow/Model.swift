@@ -58,7 +58,7 @@ public protocol Model {
 }
 
 /// Data about a model's state value.
-public struct ModelData {
+public struct ModelData: Sendable {
 
     /// The state value's identifier.
     var storage: StateContent.Storage
@@ -67,22 +67,7 @@ public struct ModelData {
 
 }
 
-/// Extend the model.
 extension Model {
-
-    /// Get the value as a binding.
-    public var binding: Binding<Self> {
-        .init {
-            getModel()
-        } set: { newValue in
-            guard let data = model else {
-                return
-            }
-            data.storage.value = newValue
-            data.storage.update = true
-            StateManager.updateViews(force: data.force)
-        }
-    }
 
     /// Set the model up.
     ///
@@ -113,6 +98,24 @@ extension Model {
             return self
         }
         return data.storage.value as? Self ?? self
+    }
+
+}
+
+extension Model where Self: Sendable {
+
+    /// Get the value as a binding.
+    public var binding: Binding<Self> {
+        .init {
+            getModel()
+        } set: { newValue in
+            guard let data = model else {
+                return
+            }
+            data.storage.value = newValue
+            data.storage.update = true
+            StateManager.updateViews(force: data.force)
+        }
     }
 
 }

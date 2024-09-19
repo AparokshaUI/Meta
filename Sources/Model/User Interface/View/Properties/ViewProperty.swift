@@ -15,7 +15,7 @@ public struct ViewProperty<Pointer, ViewPointer>: ViewPropertyProtocol {
     /// The wrapped value.
     public var wrappedValue: Body = []
     /// Set the view.
-    var setView: (Pointer, ViewPointer) -> Void
+    var setView: @Sendable (Pointer, ViewPointer) async -> Void
 
     /// Initialize a property.
     /// - Parameters:
@@ -23,7 +23,7 @@ public struct ViewProperty<Pointer, ViewPointer>: ViewPropertyProtocol {
     ///     - pointer: The pointer type of the parent view (usually a concrete view type).
     ///     - subview: The pointer type of the child view (usually a protocol, view class, or similar).
     public init(
-        set setView: @escaping (Pointer, ViewPointer) -> Void,
+        set setView: @Sendable @escaping (Pointer, ViewPointer) async -> Void,
         pointer: Pointer.Type,
         subview: ViewPointer.Type
     ) {
@@ -35,7 +35,7 @@ public struct ViewProperty<Pointer, ViewPointer>: ViewPropertyProtocol {
 /// The view property protocol.
 ///
 /// Do not use for wrapper widgets.
-protocol ViewPropertyProtocol {
+protocol ViewPropertyProtocol: Sendable {
 
     /// The type of the view's pointer.
     associatedtype Pointer
@@ -45,6 +45,6 @@ protocol ViewPropertyProtocol {
     /// The wrapped value.
     var wrappedValue: Body { get }
     /// Set the view.
-    var setView: (Pointer, ViewPointer) -> Void { get }
+    var setView: @Sendable (Pointer, ViewPointer) async -> Void { get }
 
 }

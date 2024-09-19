@@ -21,8 +21,8 @@ struct Freeze: ConvenienceWidget {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
-        content.storage(data: data, type: type)
+    ) async -> ViewStorage where Data: ViewRenderData {
+        await content.storage(data: data, type: type)
     }
 
     /// Update the stored content.
@@ -36,11 +36,11 @@ struct Freeze: ConvenienceWidget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         guard !freeze else {
             return
         }
-        content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+        await content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
 }

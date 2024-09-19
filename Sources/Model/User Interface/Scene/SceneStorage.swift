@@ -6,29 +6,29 @@
 //
 
 /// Store a reference to a rendered scene element in a view storage.
-public class SceneStorage {
+public actor SceneStorage {
 
     /// The scene element's identifier.
     public var id: String
     /// The pointer.
     ///
     /// It can be a C pointer, a Swift class, or other information depending on the backend.
-    public var pointer: Any?
+    public var pointer: Sendable?
     /// The scene element's view content.
-    public var content: [String: [ViewStorage]]
+    var content: [String: [ViewStorage]]
     /// Various properties of a scene element.
-    public var fields: [String: Any] = [:]
+    var fields: [String: Sendable] = [:]
     /// Whether the reference to the window should disappear in the next update.
     public var destroy = false
     /// Show the scene element (including moving into the foreground, if possible).
-    public var show: () -> Void
+    public var show: @Sendable () -> Void
     /// The previous state of the scene element.
     public var previousState: SceneElement?
 
     /// The pointer as an opaque pointer, as this may be needed with backends interoperating with C or C++.
-    public var opaquePointer: OpaquePointer? {
+    public var opaquePointer: Pointer? {
         get {
-            pointer as? OpaquePointer
+            pointer as? Pointer
         }
         set {
             pointer = newValue
@@ -43,14 +43,62 @@ public class SceneStorage {
     ///   - show: Function called when the scene element should be displayed.
     public init(
         id: String,
-        pointer: Any?,
+        pointer: Sendable?,
         content: [String: [ViewStorage]] = [:],
-        show: @escaping () -> Void
+        show: @Sendable @escaping () -> Void
     ) {
         self.id = id
         self.pointer = pointer
         self.content = content
         self.show = show
+    }
+
+    /// Set the pointer.
+    /// - Parameter value: The new pointer.
+    public func setPointer(_ value: Sendable?) {
+        pointer = value
+    }
+
+    /// Set the element of a certain field.
+    /// - Parameters:
+    ///     - key: The key.
+    ///     - value: The field.
+    public func setField(key: String, value: Sendable) {
+        fields[key] = value
+    }
+
+    /// Get the element of a certain field.
+    /// - Parameter key: The key.
+    /// - Returns: The field.
+    public func getField(key: String) -> Sendable? {
+        fields[key]
+    }
+
+    /// Set the content elements under a certain key.
+    /// - Parameters:
+    ///     - key: The key.
+    ///     - value: The content elements.
+    public func setContent(key: String, value: [ViewStorage]) {
+        content[key] = value
+    }
+
+    /// Get the content elements under a certain key.
+    /// - Parameter key: The key.
+    /// - Returns: The content elements.
+    public func getContent(key: String) -> [ViewStorage] {
+        content[key] ?? []
+    }
+
+    /// Set the previous state.
+    /// - Parameter state: The state.
+    public func setPreviousState(_ state: SceneElement?) {
+        previousState = state
+    }
+
+    /// Set whether the scene will be destroyed.
+    /// - Parameter destroy: Whether the scene will be destroyed.
+    public func setDestroy(_ destroy: Bool) {
+        self.destroy = destroy
     }
 
 }

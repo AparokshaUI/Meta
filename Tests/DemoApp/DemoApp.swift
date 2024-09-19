@@ -1,5 +1,5 @@
 import Foundation
-@testable import Meta
+import Meta
 import SampleBackends
 
 @main
@@ -73,7 +73,7 @@ struct TestView: View {
 
 }
 
-struct TestModel: Model {
+struct TestModel: Sendable, Model {
 
     var test = "Label"
 

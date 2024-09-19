@@ -6,7 +6,7 @@
 //
 
 /// The app storage protocol.
-public protocol AppStorage: AnyObject {
+public protocol AppStorage: Actor, Sendable {
 
     /// The type of scene elements (which should be backend-specific).
     associatedtype SceneElementType
@@ -20,10 +20,28 @@ public protocol AppStorage: AnyObject {
 
     /// Run the application.
     /// - Parameter setup: A closure that is expected to be executed right at the beginning.
-    func run(setup: @escaping () -> Void)
+    nonisolated func run(setup: @escaping () -> Void)
 
     /// Terminate the application.
-    func quit()
+    nonisolated func quit()
+
+}
+
+extension AppStorage {
+
+    /// Modify the app storage.
+    /// - Parameter modify: The modifications.
+    func modifyStandardAppStorage(_ modify: (inout StandardAppStorage) -> Void) {
+        var copy = storage
+        modify(&copy)
+        self.storage = copy
+    }
+
+    /// Append a scene.
+    /// - Parameter scene: The scene.
+    public func appendScene(_ scene: SceneStorage) {
+        modifyStandardAppStorage { $0.sceneStorage.append(scene) }
+    }
 
 }
 
@@ -32,13 +50,28 @@ extension AppStorage {
 
     /// Focus the scene element with a certain id (if supported). Create the element if it doesn't already exist.
     /// - Parameter id: The element's id.
-    public func showSceneElement(_ id: String) {
-        storage.sceneStorage.last { $0.id == id && !$0.destroy }?.show() ?? addSceneElement(id)
+    nonisolated public func showSceneElement(_ id: String) {
+        Task {
+            await storage.sceneStorage
+                .last { scene in
+                    let destroy = await scene.destroy
+                    return await scene.id == id && !destroy
+                }?
+                .show() ?? addSceneElement(id)
+        }
     }
 
     /// Add a new scene element with the content of the scene element with a certain id.
     /// - Parameter id: The element's id.
-    public func addSceneElement(_ id: String) {
+    nonisolated public func addSceneElement(_ id: String) {
+        Task {
+            await internalAddSceneElement(id)
+        }
+    }
+
+    /// Add a new scene element with the content of the scene element with a certain id.
+    /// - Parameter id: The element's id.
+    func internalAddSceneElement(_ id: String) {
         if let element = storage.app?().scene.last(where: { $0.id == id }) {
             let container = element.container(app: self)
             storage.sceneStorage.append(container)
@@ -48,13 +81,13 @@ extension AppStorage {
 
     /// Focus the window with a certain id (if supported). Create the window if it doesn't already exist.
     /// - Parameter id: The window's id.
-    public func showWindow(_ id: String) {
+    nonisolated public func showWindow(_ id: String) {
         showSceneElement(id)
     }
 
     /// Add a new window with the content of the window template with a certain id.
     /// - Parameter id: The window template's id.
-    public func addWindow(_ id: String) {
+    nonisolated public func addWindow(_ id: String) {
         addSceneElement(id)
     }
 

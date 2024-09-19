@@ -10,10 +10,10 @@
 /// This will be used if you do not provide a custom ``Widget/update(_:data:updateProperties:type:)`` method
 /// or call the ``Widget/updateProperties(_:updateProperties:)`` method in your custom update method.
 @propertyWrapper
-public struct Property<Value, Pointer>: PropertyProtocol {
+public struct Property<Value, Pointer>: PropertyProtocol where Value: Sendable {
 
     /// The function applying the property to the UI.
-    public var setProperty: (Pointer, Value, ViewStorage) -> Void
+    public var setProperty: @Sendable (Pointer, Value, ViewStorage) async -> Void
     /// The wrapped value.
     public var wrappedValue: Value
     /// The update strategy.
@@ -27,7 +27,7 @@ public struct Property<Value, Pointer>: PropertyProtocol {
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
         wrappedValue: Value,
-        set setProperty: @escaping (Pointer, Value, ViewStorage) -> Void,
+        set setProperty: @Sendable @escaping (Pointer, Value, ViewStorage) async -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
@@ -44,13 +44,13 @@ public struct Property<Value, Pointer>: PropertyProtocol {
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
         wrappedValue: Value,
-        set setProperty: @escaping (Pointer, Value) -> Void,
+        set setProperty: @Sendable @escaping (Pointer, Value) async -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
         self.init(
             wrappedValue: wrappedValue,
-            set: { pointer, value, _ in setProperty(pointer, value) },
+            set: { pointer, value, _ in await setProperty(pointer, value) },
             pointer: pointer,
             updateStrategy: updateStrategy
         )
@@ -66,13 +66,13 @@ extension Property where Value: OptionalProtocol {
     ///     - pointer: The type of the pointer.
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
-        set setProperty: @escaping (Pointer, Value.Wrapped, ViewStorage) -> Void,
+        set setProperty: @Sendable @escaping (Pointer, Value.Wrapped, ViewStorage) async -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
         self.setProperty = { pointer, value, storage in
             if let value = value.optionalValue {
-                setProperty(pointer, value, storage)
+                await setProperty(pointer, value, storage)
             }
         }
         wrappedValue = nil
@@ -86,12 +86,12 @@ extension Property where Value: OptionalProtocol {
     ///     - pointer: The type of the pointer.
     ///     - updateStrategy: The update strategy, this should be ``UpdateStrategy/automatic`` in most cases.
     public init(
-        set setProperty: @escaping (Pointer, Value.Wrapped) -> Void,
+        set setProperty: @Sendable @escaping (Pointer, Value.Wrapped) async -> Void,
         pointer: Pointer.Type,
         updateStrategy: UpdateStrategy = .automatic
     ) {
         self.init(
-            set: { pointer, value, _ in setProperty(pointer, value) },
+            set: { pointer, value, _ in await setProperty(pointer, value) },
             pointer: pointer,
             updateStrategy: updateStrategy
         )
@@ -100,7 +100,7 @@ extension Property where Value: OptionalProtocol {
 }
 
 /// The property protocol.
-protocol PropertyProtocol {
+protocol PropertyProtocol: Sendable {
 
     /// The type of the wrapped value.
     associatedtype Value
@@ -110,14 +110,14 @@ protocol PropertyProtocol {
     /// The wrapped value.
     var wrappedValue: Value { get }
     /// Set the property.
-    var setProperty: (Pointer, Value, ViewStorage) -> Void { get }
+    var setProperty: @Sendable (Pointer, Value, ViewStorage) async -> Void { get }
     /// The update strategy.
     var updateStrategy: UpdateStrategy { get }
 
 }
 
 /// The update strategy for properties.
-public enum UpdateStrategy {
+public enum UpdateStrategy: Sendable {
 
     /// If equatable, update only when the value changed.
     /// If not equatable, this is equivalent to ``UpdateStrategy/always``.
@@ -140,10 +140,10 @@ extension Widget {
     public func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
+    ) async -> ViewStorage where Data: ViewRenderData {
         let storage = ViewStorage(initializeWidget())
-        initProperties(storage, data: data, type: type)
-        update(storage, data: data, updateProperties: true, type: type)
+        await initProperties(storage, data: data, type: type)
+        await update(storage, data: data, updateProperties: true, type: type)
         return storage
     }
 
@@ -160,10 +160,10 @@ extension Widget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
-        self.updateProperties(storage, data: data, updateProperties: updateProperties, type: type)
+    ) async where Data: ViewRenderData {
+        await self.updateProperties(storage, data: data, updateProperties: updateProperties, type: type)
         if updateProperties {
-            storage.previousState = self
+            await storage.setPreviousState(self)
         }
     }
 
@@ -176,16 +176,16 @@ extension Widget {
         _ storage: ViewStorage,
         data: WidgetData,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         let mirror = Mirror(reflecting: self)
         for property in mirror.children {
             if let value = property.value as? any ViewPropertyProtocol {
-                let subview = value.wrappedValue.storage(data: data, type: type)
-                initViewProperty(value, view: subview, parent: storage)
-                storage.content[property.label ?? .mainContent] = [subview]
+                let subview = await value.wrappedValue.storage(data: data, type: type)
+                await initViewProperty(value, view: subview, parent: storage)
+                await storage.setContent(key: property.label ?? .mainContent, value: [subview])
             }
             if let value = property.value as? any BindingPropertyProtocol {
-                initBindingProperty(value, parent: storage)
+                await initBindingProperty(value, parent: storage)
             }
         }
     }
@@ -199,9 +199,10 @@ extension Widget {
         _ value: Property,
         view: ViewStorage,
         parent: ViewStorage
-    ) where Property: ViewPropertyProtocol {
-        if let view = view.pointer as? Property.ViewPointer, let pointer = parent.pointer as? Property.Pointer {
-            value.setView(pointer, view)
+    ) async where Property: ViewPropertyProtocol {
+        if let view = await view.pointer as? Property.ViewPointer,
+           let pointer = await parent.pointer as? Property.Pointer {
+            await value.setView(pointer, view)
         }
     }
 
@@ -209,9 +210,12 @@ extension Widget {
     /// - Parameters:
     ///     - value: The property.
     ///     - parent: The view storage.
-    func initBindingProperty<Property>(_ value: Property, parent: ViewStorage) where Property: BindingPropertyProtocol {
-        if let view = parent.pointer as? Property.Pointer {
-            value.observe(
+    func initBindingProperty<Property>(
+        _ value: Property,
+        parent: ViewStorage
+    ) async where Property: BindingPropertyProtocol {
+        if let view = await parent.pointer as? Property.Pointer {
+            await value.observe(
                 view,
                 .init {
                     value.wrappedValue.wrappedValue
@@ -237,14 +241,20 @@ extension Widget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         let mirror = Mirror(reflecting: self)
-        updateNotEquatable(mirror: mirror, storage: storage, data: data, updateProperties: updateProperties, type: type)
+        await updateNotEquatable(
+            mirror: mirror,
+            storage: storage,
+            data: data,
+            updateProperties: updateProperties,
+            type: type
+        )
         guard updateProperties else {
             return
         }
-        updateAlwaysWhenStateUpdate(mirror: mirror, storage: storage)
-        updateEquatable(mirror: mirror, storage: storage)
+        await updateAlwaysWhenStateUpdate(mirror: mirror, storage: storage)
+        await updateEquatable(mirror: mirror, storage: storage)
     }
 
     /// Update the properties which are not equatable and should always be updated (e.g. closures).
@@ -260,20 +270,21 @@ extension Widget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         for property in mirror.children {
             if let value = property.value as? any PropertyProtocol {
                 if value.updateStrategy == .always ||
                 value.wrappedValue as? any Equatable == nil && value.updateStrategy != .alwaysWhenStateUpdate {
-                    setProperty(property: value, storage: storage)
+                    await setProperty(property: value, storage: storage)
                 }
             }
             if let value = property.value as? any ViewPropertyProtocol,
-               let storage = storage.content[property.label ?? .mainContent]?.first {
-               value.wrappedValue.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+                let storage = await storage.getContent(key: property.label ?? .mainContent).first {
+                await value.wrappedValue
+                    .updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
             }
             if let value = property.value as? any BindingPropertyProtocol {
-                setBindingProperty(property: value, storage: storage)
+                await setBindingProperty(property: value, storage: storage)
             }
         }
     }
@@ -285,11 +296,11 @@ extension Widget {
     ///     - storage: The view storage.
     ///
     /// Initialize the ``Property`` property wrapper with the ``UpdateStrategy/alwaysWhenStateUpdate``.
-    func updateAlwaysWhenStateUpdate(mirror: Mirror, storage: ViewStorage) {
+    func updateAlwaysWhenStateUpdate(mirror: Mirror, storage: ViewStorage) async {
         for property in mirror.children {
             if let value = property.value as? any PropertyProtocol {
                 if value.updateStrategy == .alwaysWhenStateUpdate {
-                    setProperty(property: value, storage: storage)
+                    await setProperty(property: value, storage: storage)
                 }
             }
         }
@@ -299,8 +310,8 @@ extension Widget {
     /// - Parameters:
     ///     - mirror: A mirror of the widget.
     ///     - storage: The view storage.
-    func updateEquatable(mirror: Mirror, storage: ViewStorage) {
-        let previousState: Mirror.Children? = if let previousState = storage.previousState {
+    func updateEquatable(mirror: Mirror, storage: ViewStorage) async {
+        let previousState: Mirror.Children? = if let previousState = await storage.previousState {
             Mirror(reflecting: previousState).children
         } else {
             nil
@@ -317,7 +328,7 @@ extension Widget {
                     update = false
                 }
                 if update {
-                    setProperty(property: value, storage: storage)
+                    await setProperty(property: value, storage: storage)
                 }
             }
         }
@@ -354,12 +365,12 @@ extension Widget {
     /// - Parameters:
     ///     - property: The property.
     ///     - storage: The view storage.
-    func setProperty<Property>(property: Property, storage: ViewStorage) where Property: PropertyProtocol {
+    func setProperty<Property>(property: Property, storage: ViewStorage) async where Property: PropertyProtocol {
         if let optional = property.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
             return
         }
-        if let pointer = storage.pointer as? Property.Pointer {
-            property.setProperty(pointer, property.wrappedValue, storage)
+        if let pointer = await storage.pointer as? Property.Pointer {
+            await property.setProperty(pointer, property.wrappedValue, storage)
         }
     }
 

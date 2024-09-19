@@ -9,13 +9,13 @@
 struct StateWrapper: ConvenienceWidget {
 
     /// The content.
-    var content: () -> Body
+    var content: @Sendable () -> Body
     /// The state information (from properties with the `State` wrapper).
     var state: [String: StateProtocol] = [:]
 
     /// Initialize a `StateWrapper`.
     /// - Parameter content: The view content.
-    init(@ViewBuilder content: @escaping () -> Body) {
+    init(@ViewBuilder content: @Sendable @escaping () -> Body) {
         self.content = content
     }
 
@@ -23,7 +23,7 @@ struct StateWrapper: ConvenienceWidget {
     /// - Parameters:
     ///   - content: The view content.
     ///   - state: The state information.
-    init(content: @escaping () -> Body, state: [String: StateProtocol]) {
+    init(content: @Sendable @escaping () -> Body, state: [String: StateProtocol]) {
         self.content = content
         self.state = state
     }
@@ -40,10 +40,10 @@ struct StateWrapper: ConvenienceWidget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         var updateProperties = updateProperties
         for property in state {
-            if let storage = storage.state[property.key]?.content.storage {
+            if let storage = await storage.getState(key: property.key)?.content.storage {
                 property.value.content.storage = storage
             }
             if property.value.content.update {
@@ -51,10 +51,10 @@ struct StateWrapper: ConvenienceWidget {
                 property.value.content.update = false
             }
         }
-        guard let storage = storage.content[.mainContent]?.first else {
+        guard let storage = await storage.getContent(key: .mainContent).first else {
             return
         }
-        content().updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+        await content().updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
     /// Get a view storage.
@@ -65,10 +65,10 @@ struct StateWrapper: ConvenienceWidget {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
-        let content = content().storage(data: data, type: type)
-        let storage = ViewStorage(content.pointer, content: [.mainContent: [content]])
-        storage.state = state
+    ) async -> ViewStorage where Data: ViewRenderData {
+        let content = await content().storage(data: data, type: type)
+        let storage = ViewStorage(await content.pointer, content: [.mainContent: [content]])
+        await storage.setState(state)
         for element in state {
             element.value.setup()
         }

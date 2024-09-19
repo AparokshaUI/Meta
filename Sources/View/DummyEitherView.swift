@@ -23,9 +23,9 @@ struct DummyEitherView: ConvenienceWidget {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
+    ) async -> ViewStorage where Data: ViewRenderData {
         let content = type.EitherViewType(condition) { view1 ?? [] } else: { view2 ?? [] }
-        let storage = content.storage(data: data, type: type)
+        let storage = await content.storage(data: data, type: type)
         return storage
     }
 
@@ -40,9 +40,9 @@ struct DummyEitherView: ConvenienceWidget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         let content = type.EitherViewType(condition) { view1 ?? [] } else: { view2 ?? [] }
-        content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
+        await content.updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
 }

@@ -9,7 +9,7 @@ import Foundation
 
 /// A property wrapper for properties in a view that should be stored throughout view updates.
 @propertyWrapper
-public struct State<Value>: StateProtocol {
+public struct State<Value>: StateProtocol, Sendable where Value: Sendable {
 
     /// Access the stored value. This updates the views when being changed.
     public var wrappedValue: Value {
@@ -49,7 +49,7 @@ public struct State<Value>: StateProtocol {
     var forceUpdates: Bool
 
     /// The closure for initializing the state property's value.
-    var getInitialValue: () -> Value
+    var getInitialValue: @Sendable () -> Value
 
     /// The content.
     let content: StateContent = .init()
@@ -59,7 +59,7 @@ public struct State<Value>: StateProtocol {
     ///     - wrappedValue: The wrapped value.
     ///     - id: An explicit identifier.
     ///     - forceUpdates: Whether to force update all available views when the property gets modified.
-    public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
+    public init(wrappedValue: @Sendable @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
         getInitialValue = wrappedValue
         self.forceUpdates = forceUpdates
     }

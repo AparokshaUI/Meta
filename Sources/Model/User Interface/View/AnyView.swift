@@ -6,7 +6,7 @@
 //
 
 /// The view type used for any form of a view.
-public protocol AnyView {
+public protocol AnyView: Sendable {
 
     /// The view's content.
     @ViewBuilder var viewContent: Body { get }
@@ -38,8 +38,8 @@ extension AnyView {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
-        widget(data: data, type: type)
+    ) async where Data: ViewRenderData {
+        await widget(data: data, type: type)
             .update(storage, data: data, updateProperties: updateProperties, type: type)
     }
 
@@ -51,8 +51,8 @@ extension AnyView {
     public func storage<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
-        widget(data: data, type: type).container(data: data, type: type)
+    ) async -> ViewStorage where Data: ViewRenderData {
+        await widget(data: data, type: type).container(data: data, type: type)
     }
 
     /// Wrap the view into a widget.

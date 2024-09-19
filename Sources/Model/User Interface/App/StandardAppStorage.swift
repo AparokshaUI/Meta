@@ -6,7 +6,7 @@
 //
 
 /// The app storage protocol.
-public struct StandardAppStorage {
+public struct StandardAppStorage: Sendable {
 
     /// The scene storage.
     public var sceneStorage: [SceneStorage] = []
@@ -15,7 +15,7 @@ public struct StandardAppStorage {
     var stateStorage: [String: StateProtocol] = [:]
 
     /// The scene.
-    var app: (() -> any App)?
+    var app: (@Sendable () -> any App)?
 
     /// Initialize the standard app storage.
     public init() { }

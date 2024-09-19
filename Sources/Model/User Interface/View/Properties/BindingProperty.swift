@@ -10,14 +10,14 @@
 /// This will be used if you do not provide a custom ``Widget/update(_:data:updateProperties:type:)`` method
 /// or call the ``Widget/updateProperties(_:updateProperties:)`` method in your custom update method.
 @propertyWrapper
-public struct BindingProperty<Value, Pointer>: BindingPropertyProtocol {
+public struct BindingProperty<Value, Pointer>: BindingPropertyProtocol where Value: Sendable {
 
     /// The wrapped binding.
     public var wrappedValue: Binding<Value>
     /// Observe the UI element.
-    var observe: (Pointer, Binding<Value>, ViewStorage) -> Void
+    var observe: @Sendable (Pointer, Binding<Value>, ViewStorage) async -> Void
     /// Set the UI element's property.
-    var setValue: (Pointer, Value, ViewStorage) -> Void
+    var setValue: @Sendable (Pointer, Value, ViewStorage) async -> Void
 
     /// Initialize a property.
     /// - Parameters:
@@ -27,8 +27,8 @@ public struct BindingProperty<Value, Pointer>: BindingPropertyProtocol {
     ///     - pointer: The type of the pointer.
     public init(
         wrappedValue: Binding<Value>,
-        observe: @escaping (Pointer, Binding<Value>, ViewStorage) -> Void,
-        set setValue: @escaping (Pointer, Value, ViewStorage) -> Void,
+        observe: @Sendable @escaping (Pointer, Binding<Value>, ViewStorage) async -> Void,
+        set setValue: @Sendable @escaping (Pointer, Value, ViewStorage) async -> Void,
         pointer: Pointer.Type
     ) {
         self.wrappedValue = wrappedValue
@@ -44,14 +44,14 @@ public struct BindingProperty<Value, Pointer>: BindingPropertyProtocol {
     ///     - pointer: The type of the pointer.
     public init(
         wrappedValue: Binding<Value>,
-        observe: @escaping (Pointer, Binding<Value>) -> Void,
-        set setValue: @escaping (Pointer, Value) -> Void,
+        observe: @Sendable @escaping (Pointer, Binding<Value>) async -> Void,
+        set setValue: @Sendable @escaping (Pointer, Value) async -> Void,
         pointer: Pointer.Type
     ) {
         self.init(
             wrappedValue: wrappedValue,
-            observe: { pointer, value, _ in observe(pointer, value) },
-            set: { pointer, value, _ in setValue(pointer, value) },
+            observe: { pointer, value, _ in await observe(pointer, value) },
+            set: { pointer, value, _ in await setValue(pointer, value) },
             pointer: pointer
         )
     }
@@ -59,19 +59,19 @@ public struct BindingProperty<Value, Pointer>: BindingPropertyProtocol {
 }
 
 /// The binding property protocol.
-protocol BindingPropertyProtocol {
+protocol BindingPropertyProtocol: Sendable {
 
     /// The binding's wrapped value.
-    associatedtype Value
+    associatedtype Value: Sendable
     /// The storage's pointer.
     associatedtype Pointer
 
     /// The wrapped value.
     var wrappedValue: Binding<Value> { get }
     /// Observe the property.
-    var observe: (Pointer, Binding<Value>, ViewStorage) -> Void { get }
+    var observe: @Sendable (Pointer, Binding<Value>, ViewStorage) async -> Void { get }
     /// Set the property.
-    var setValue: (Pointer, Value, ViewStorage) -> Void { get }
+    var setValue: @Sendable (Pointer, Value, ViewStorage) async -> Void { get }
 
 }
 
@@ -84,12 +84,12 @@ extension Widget {
     func setBindingProperty<Property>(
         property: Property,
         storage: ViewStorage
-    ) where Property: BindingPropertyProtocol {
+    ) async where Property: BindingPropertyProtocol {
         if let optional = property.wrappedValue.wrappedValue as? any OptionalProtocol, optional.optionalValue == nil {
             return
         }
-        if let pointer = storage.pointer as? Property.Pointer {
-            property.setValue(pointer, property.wrappedValue.wrappedValue, storage)
+        if let pointer = await storage.pointer as? Property.Pointer {
+            await property.setValue(pointer, property.wrappedValue.wrappedValue, storage)
         }
     }
 

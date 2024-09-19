@@ -39,7 +39,7 @@
 /// ```
 @propertyWrapper
 @dynamicMemberLookup
-public struct Binding<Value> {
+public struct Binding<Value>: Sendable where Value: Sendable {
 
     /// The value.
     public var wrappedValue: Value {
@@ -64,11 +64,11 @@ public struct Binding<Value> {
     }
 
     /// The closure for getting the value.
-    private let getValue: () -> Value
+    private let getValue: @Sendable () -> Value
     /// The closure for settings the value.
-    private let setValue: (Value) -> Void
+    private let setValue: @Sendable (Value) -> Void
     /// Handlers observing whether the binding changes.
-    private var handlers: [(Value) -> Void] = []
+    private var handlers: [@Sendable (Value) -> Void] = []
 
     /// Get a property of any content of a `Binding` as a `Binding`.
     /// - Parameter keyPath: The path to the member.
@@ -85,7 +85,7 @@ public struct Binding<Value> {
     /// - Parameters:
     ///   - get: The closure for getting the value.
     ///   - set: The closure for setting the value.
-    public init(get: @escaping () -> Value, set: @escaping (Value) -> Void) {
+    public init(get: @Sendable @escaping () -> Value, set: @Sendable @escaping (Value) -> Void) {
         self.getValue = get
         self.setValue = set
     }
@@ -104,7 +104,7 @@ public struct Binding<Value> {
     /// Observe whether data is changed over this binding.
     /// - Parameter handler: The handler.
     /// - Returns: The binding.
-    public func onSet(_ handler: @escaping (Value) -> Void) -> Self {
+    public func onSet(_ handler: @Sendable @escaping (Value) -> Void) -> Self {
         var newSelf = self
         newSelf.handlers.append(handler)
         return newSelf
@@ -113,7 +113,7 @@ public struct Binding<Value> {
 }
 
 /// Extend bindings.
-extension Binding where Value: MutableCollection {
+extension Binding where Value: MutableCollection, Value.Index: Sendable, Value.Element: Sendable {
 
     /// Get a child at a certain index of the array as a binding.
     /// - Parameters:
@@ -136,7 +136,8 @@ extension Binding where Value: MutableCollection {
 }
 
 /// Extend bindings.
-extension Binding where Value: MutableCollection, Value.Element: Identifiable {
+extension Binding
+where Value: MutableCollection, Value.Element: Identifiable, Value.Index: Sendable, Value.Element: Sendable {
 
     /// Get a child of the array with a certain id as a binding.
     /// - Parameters:

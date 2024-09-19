@@ -21,7 +21,7 @@
 /// }
 /// ```
 ///
-public protocol App {
+public protocol App: Sendable {
 
     /// The app storage type.
     associatedtype Storage: AppStorage
@@ -60,26 +60,30 @@ extension App {
     public static func setupApp() -> Self {
         var appInstance = self.init()
         appInstance.app = Storage(id: appInstance.id)
-        appInstance.app.storage.app = { appInstance }
-        StateManager.addUpdateHandler { force in
+        StateManager.addUpdateHandler { [appInstance] force in
             let updateProperties = force || appInstance.getState().contains { $0.value.content.update }
             var removeIndices: [Int] = []
-            for (index, element) in appInstance.app.storage.sceneStorage.enumerated() {
-                if element.destroy {
+            for (index, element) in await appInstance.app.storage.sceneStorage.enumerated() {
+                if await element.destroy {
                     removeIndices.insert(index, at: 0)
-                } else if let scene = appInstance.scene.first(
-                    where: { $0.id == element.id }
+                } else if let scene = await appInstance.scene.first(
+                    where: { await $0.id == element.id }
                 ) as? Storage.SceneElementType as? SceneElement {
                     scene.update(element, app: appInstance.app, updateProperties: updateProperties)
                 }
             }
             for index in removeIndices {
-                appInstance.app.storage.sceneStorage.remove(at: index)
+                await appInstance.app.modifyStandardAppStorage { $0.sceneStorage.remove(at: index) }
             }
         }
         StateManager.appID = appInstance.id
-        let state = appInstance.getState()
-        appInstance.app.storage.stateStorage = state
+        Task { [appInstance] in
+            let state = appInstance.getState()
+            await appInstance.app.modifyStandardAppStorage { storage in
+                storage.stateStorage = state
+                storage.app = { appInstance }
+            }
+        }
         return appInstance
     }
 

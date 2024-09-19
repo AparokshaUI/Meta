@@ -6,16 +6,16 @@ public enum Backend2 {
     
         public init() { }
     
-        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 2")
             let storage = ViewStorage(nil)
-            storage.fields["test"] = 0
+            await storage.setField(key: "test", value: 0)
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-            print("Update test widget 2 (#\(storage.fields["test"] ?? ""))")
-            storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async {
+            print("Update test widget 2 (#\(await storage.getField(key: "test") ?? ""))")
+            await storage.setField(key: "test", value: (storage.getField(key: "test") as? Int ?? 0) + 1)
         }
     
     }
@@ -24,16 +24,16 @@ public enum Backend2 {
 
         public init() { }
 
-        public func container<Data>(data: WidgetData, type: Data.Type) -> ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> ViewStorage where Data: ViewRenderData {
             print("Init test widget 4")
             let storage = ViewStorage(nil)
-            storage.fields["test"] = 0
+            await storage.setField(key: "test", value: 0)
             return storage
         }
 
-        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) {
-            print("Update test widget 4 (#\(storage.fields["test"] ?? ""))")
-            storage.fields["test"] = (storage.fields["test"] as? Int ?? 0) + 1
+        public func update<Data>(_ storage: ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async {
+            print("Update test widget 4 (#\(await storage.getField(key: "test") ?? ""))")
+            await storage.setField(key: "test", value: (storage.getField(key: "test") as? Int ?? 0) + 1)
         }
 
     }
@@ -46,17 +46,15 @@ public enum Backend2 {
             self.content = content()
         }
 
-        public func container<Data>(data: WidgetData, type: Data.Type) -> Meta.ViewStorage where Data: ViewRenderData {
+        public func container<Data>(data: WidgetData, type: Data.Type) async -> Meta.ViewStorage where Data: ViewRenderData {
             let storage = ViewStorage(nil)
-            storage.content = [.mainContent: content.storages(data: data, type: type)]
+            await storage.setContent(key: .mainContent, value: content.storages(data: data, type: type))
             return storage
         }
 
-        public func update<Data>(_ storage: Meta.ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) where Data: ViewRenderData {
-            guard let storages = storage.content[.mainContent] else {
-                return
-            }
-            content.update(storages, data: data, updateProperties: updateProperties, type: type)
+        public func update<Data>(_ storage: Meta.ViewStorage, data: WidgetData, updateProperties: Bool, type: Data.Type) async where Data: ViewRenderData {
+            let storages = await storage.getContent(key: .mainContent)
+            await content.update(storages, data: data, updateProperties: updateProperties, type: type)
         }
 
     }
@@ -65,19 +63,19 @@ public enum Backend2 {
 
     public protocol BackendSceneElement: SceneElement { }
 
-    public class Backend2App: AppStorage {
+    public actor Backend2App: AppStorage{
 
         public typealias SceneElementType = BackendSceneElement
 
         public var storage: StandardAppStorage = .init()
 
-        public required init(id: String) { }
+        public init(id: String) { }
 
-        public func run(setup: @escaping () -> Void) {
+        nonisolated public func run(setup: @escaping () -> Void) {
             setup()
         }
 
-        public func quit() {
+        nonisolated public func quit() {
             fatalError("Quit")
         }
 

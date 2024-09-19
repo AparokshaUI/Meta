@@ -19,7 +19,7 @@ public protocol Widget: AnyView {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData
+    ) async -> ViewStorage where Data: ViewRenderData
 
     /// Update the stored content.
     /// - Parameters:
@@ -32,14 +32,14 @@ public protocol Widget: AnyView {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData
+    ) async where Data: ViewRenderData
 
     /// Get the widget.
     /// - Returns: The widget.
     ///
     /// Define this function only if you do not define ``Widget/container(data:type:)``.
     /// Otherwise, it will not have an effect.
-    func initializeWidget() -> Any
+    func initializeWidget() -> Sendable
 
 }
 
@@ -51,7 +51,7 @@ extension Widget {
 
     /// Print a warning if the widget does not set this function but it gets accessed.
     /// - Returns: A dummy pointer.
-    public func initializeWidget() -> Any {
+    public func initializeWidget() -> Sendable {
         print("Warning: Define initialize widget function or container function for \(Self.self)")
         return ""
     }

@@ -44,10 +44,10 @@ extension Array: AnyView where Element == AnyView {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
+    ) async where Data: ViewRenderData {
         for (index, element) in filter({ $0.renderable(type: type, data: data) }).enumerated() {
             if let storage = storages[safe: index] {
-                element
+                await element
                     .widget(data: data, type: type)
                     .updateStorage(storage, data: data, updateProperties: updateProperties, type: type)
             }
@@ -62,9 +62,9 @@ extension Array: AnyView where Element == AnyView {
     public func storages<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> [ViewStorage] where Data: ViewRenderData {
-        compactMap { view in
-            view.renderable(type: type, data: data) ? view.storage(data: data, type: type) : nil
+    ) async -> [ViewStorage] where Data: ViewRenderData {
+        await compactMap { view in
+            await view.renderable(type: type, data: data) ? view.storage(data: data, type: type) : nil
         }
     }
 
@@ -94,6 +94,63 @@ extension Array {
                 self[index] = value
             }
         }
+    }
+
+    /// Returns the first element of the sequence that satisfies the given predicate.
+    /// - Parameter predicate: A closure that takes an element of the sequence as its argument
+    /// and returns a Boolean value indicating whether the element is a match.
+    /// - Returns: The first element of the sequence that satisfies `predicate`,
+    /// or `nil` if there is no element that satisfies `predicate`.
+    public func first(where predicate: (Element) async throws -> Bool) async rethrows -> Element? {
+        for element in self {
+            let matches = try await predicate(element)
+            if matches {
+                return element
+            }
+        }
+        return nil
+    }
+
+    /// Returns the last element of the sequence that satisfies the given predicate.
+    /// - Parameter predicate: A closure that takes an element of the sequence as its argument
+    /// and returns a Boolean value indicating whether the element is a match.
+    /// - Returns: The last element of the sequence that satisfies `predicate`,
+    /// or `nil` if there is no element that satisfies `predicate`.
+    public func last(where predicate: (Element) async throws -> Bool) async rethrows -> Element? {
+        try await reversed().first(where: predicate)
+    }
+
+    /// Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
+    /// - Parameter predicate: A closure that takes an element of the sequence as its argument
+    /// and returns a Boolean value indicating whether the element is a match.
+    /// - Returns: Whether the sequence contains an element that satisfies `predicate`.
+    public func contains(where predicate: (Element) async throws -> Bool) async rethrows -> Bool {
+        try await first(where: predicate) != nil
+    }
+
+    /// Returns an array containing the results of mapping the given closure over the sequence’s elements.
+    /// Remove elements that are `nil`.
+    /// - Parameter transform: Transforms each element.
+    /// - Returns: The result.
+    public func compactMap<ElementOfResult>(
+        _ transform: (Element) async throws -> ElementOfResult?
+    ) async rethrows -> [ElementOfResult] {
+        var result: [ElementOfResult] = []
+        for element in self {
+            if let element = try await transform(element) {
+                result.append(element)
+            }
+        }
+        return result
+    }
+
+    /// Returns an array containing the results of mapping the given closure over the sequence’s elements.
+    /// - Parameter transform: Transforms each element.
+    /// - Returns: The result.
+    public func map<ElementOfResult>(
+        _ transform: (Element) async throws -> ElementOfResult
+    ) async rethrows -> [ElementOfResult] {
+        try await compactMap { try await transform($0) }
     }
 
 }

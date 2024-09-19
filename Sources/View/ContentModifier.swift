@@ -11,7 +11,7 @@ struct ContentModifier<Content>: ConvenienceWidget where Content: AnyView {
     /// The wrapped view.
     var content: AnyView
     /// The closure for the modification.
-    var modify: (Content) -> AnyView
+    var modify: @Sendable (Content) -> AnyView
 
     /// The view storage.
     /// - Parameters:
@@ -21,8 +21,8 @@ struct ContentModifier<Content>: ConvenienceWidget where Content: AnyView {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
-        content.storage(data: data.modify { $0.modifiers += [modifyView] }, type: type)
+    ) async -> ViewStorage where Data: ViewRenderData {
+        await content.storage(data: data.modify { $0.modifiers += [modifyView] }, type: type)
     }
 
     /// Update the stored content.
@@ -36,8 +36,8 @@ struct ContentModifier<Content>: ConvenienceWidget where Content: AnyView {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
-        content
+    ) async where Data: ViewRenderData {
+        await content
             .updateStorage(
                 storage,
                 data: data.modify { $0.modifiers += [modifyView] },
@@ -68,7 +68,7 @@ extension AnyView {
     /// - Returns: A view.
     public func modifyContent<Content>(
         _ type: Content.Type,
-        modify: @escaping (Content) -> AnyView
+        modify: @Sendable @escaping (Content) -> AnyView
     ) -> AnyView where Content: AnyView {
         ContentModifier(content: self, modify: modify)
     }

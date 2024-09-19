@@ -19,8 +19,8 @@ struct ModifierStopper: ConvenienceWidget {
     func container<Data>(
         data: WidgetData,
         type: Data.Type
-    ) -> ViewStorage where Data: ViewRenderData {
-        content.storage(data: data.noModifiers, type: type)
+    ) async -> ViewStorage where Data: ViewRenderData {
+        await content.storage(data: data.noModifiers, type: type)
     }
 
     /// Update the stored content.
@@ -34,8 +34,8 @@ struct ModifierStopper: ConvenienceWidget {
         data: WidgetData,
         updateProperties: Bool,
         type: Data.Type
-    ) where Data: ViewRenderData {
-        content.updateStorage(storage, data: data.noModifiers, updateProperties: updateProperties, type: type)
+    ) async where Data: ViewRenderData {
+        await content.updateStorage(storage, data: data.noModifiers, updateProperties: updateProperties, type: type)
     }
 
 }

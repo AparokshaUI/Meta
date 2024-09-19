@@ -6,7 +6,7 @@
 //
 
 /// A class storing the state's content.
-class StateContent {
+final class StateContent: @unchecked Sendable {
 
     /// The storage.
     var storage: Storage?
@@ -39,7 +39,7 @@ class StateContent {
     init() { }
 
     /// A class storing the value.
-    class Storage {
+    class Storage: @unchecked Sendable {
 
         /// The stored value.
         var value: Any
