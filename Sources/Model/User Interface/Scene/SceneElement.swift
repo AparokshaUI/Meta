@@ -6,7 +6,7 @@
 //
 
 /// A structure conforming to `SceneElement` can be added to an app's `scene` property.
-public protocol SceneElement {
+public protocol SceneElement: Sendable {
 
     /// The window type's identifier.
     var id: String { get }
