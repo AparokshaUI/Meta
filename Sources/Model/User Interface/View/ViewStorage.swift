@@ -21,13 +21,23 @@ public actor ViewStorage: Sendable {
     /// The previous state of the widget.
     public var previousState: Widget?
 
-    /// The pointer as an opaque pointer, as this is needed with backends interoperating with C or C++.
-    public var opaquePointer: Pointer? {
+    /// The pointer as an actual pointer, e.g. for interoperating with C or C++.
+    public var actualPointer: Pointer? {
         get {
             pointer as? Pointer
         }
         set {
             pointer = newValue
+        }
+    }
+
+    /// The pointer as an opaque pointer, as this is needed with backends interoperating with C or C++.
+    public var opaquePointer: OpaquePointer? {
+        get {
+            actualPointer?.opaquePointer
+        }
+        set {
+            actualPointer?.opaquePointer = newValue
         }
     }
 
@@ -41,6 +51,20 @@ public actor ViewStorage: Sendable {
         state: Widget? = nil
     ) {
         self.pointer = pointer
+        self.content = content
+        self.previousState = state
+    }
+
+    /// Initialize a view storage.
+    /// - Parameters:
+    ///   - pointer: The opaque pointer.
+    ///   - content: The view's content for container widgets.
+    public init(
+        _ pointer: OpaquePointer?,
+        content: [String: [ViewStorage]] = [:],
+        state: Widget? = nil
+    ) {
+        self.pointer = Pointer(pointer)
         self.content = content
         self.previousState = state
     }

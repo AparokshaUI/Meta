@@ -13,12 +13,17 @@ public struct Pointer: Sendable {
 
     /// Get the opaque pointer.
     public var opaquePointer: OpaquePointer? {
-        .init(bitPattern: bitPattern)
+        get {
+            .init(bitPattern: bitPattern)
+        }
+        set {
+            bitPattern = .init(bitPattern: newValue)
+        }
     }
 
     /// Initialize the pointer.
     /// - Parameter pointer: The opaque pointer.
-    public init(_ pointer: OpaquePointer) {
+    public init(_ pointer: OpaquePointer?) {
         bitPattern = .init(bitPattern: pointer)
     }
 
