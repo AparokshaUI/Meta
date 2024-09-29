@@ -26,9 +26,9 @@ public actor SceneStorage {
     public var previousState: SceneElement?
 
     /// The pointer as an opaque pointer, as this may be needed with backends interoperating with C or C++.
-    public var opaquePointer: Pointer? {
+    public var opaquePointer: OpaquePointer? {
         get {
-            pointer as? Pointer
+            pointer as? OpaquePointer
         }
         set {
             pointer = newValue
