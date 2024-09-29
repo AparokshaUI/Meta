@@ -85,7 +85,9 @@ extension Model {
         setModel(&model)
         data.storage.value = model
         data.storage.update = true
-        StateManager.updateViews(force: data.force)
+        Task {
+            await StateManager.updateViews(force: data.force)
+        }
     }
 
     /// Get the current version of the model.
@@ -114,7 +116,9 @@ extension Model where Self: Sendable {
             }
             data.storage.value = newValue
             data.storage.update = true
-            StateManager.updateViews(force: data.force)
+            Task {
+                await StateManager.updateViews(force: data.force)
+            }
         }
     }
 

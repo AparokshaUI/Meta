@@ -19,7 +19,9 @@ public struct State<Value>: StateProtocol, Sendable where Value: Sendable {
         nonmutating set {
             rawValue = newValue
             content.update = true
-            StateManager.updateViews(force: forceUpdates)
+            Task {
+                await StateManager.updateViews(force: forceUpdates)
+            }
         }
     }
 
