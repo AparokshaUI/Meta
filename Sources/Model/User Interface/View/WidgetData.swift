@@ -6,16 +6,16 @@
 //
 
 /// Data passed to widgets when initializing or updating the container.
-public struct WidgetData {
+public struct WidgetData: Sendable {
 
     /// The view modifiers.
-    public var modifiers: [(AnyView) -> AnyView] = []
+    public var modifiers: [@Sendable (AnyView) -> AnyView] = []
     /// The scene storage of the parent scene element.
     public var sceneStorage: SceneStorage
     /// The app storage of the parent app.
     public var appStorage: any AppStorage
     /// Fields for custom data.
-    public var fields: [String: Any] = [:]
+    public var fields: [String: Sendable] = [:]
 
     /// Modify the data so that there are no modifiers.
     public var noModifiers: Self {
