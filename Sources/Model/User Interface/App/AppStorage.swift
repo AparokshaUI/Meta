@@ -20,7 +20,7 @@ public protocol AppStorage: Actor, Sendable {
 
     /// Run the application.
     /// - Parameter setup: A closure that is expected to be executed right at the beginning.
-    nonisolated func run(setup: @escaping () -> Void)
+    nonisolated func run(setup: @Sendable @escaping () -> Void)
 
     /// Terminate the application.
     nonisolated func quit()
