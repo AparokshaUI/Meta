@@ -111,6 +111,21 @@ extension Array {
         return nil
     }
 
+    /// Returns the index of the first element of the sequence that satisfies the given predicate.
+    /// - Parameter predicate: A closure that takes an element of the sequence as its argument
+    /// and returns a Boolean value indicating whether the element is a match.
+    /// - Returns: The index of the first element of the sequence that satisfies `predicate`,
+    /// or `nil` if there is no element that satisfies `predicate`.
+    public func firstIndex(where predicate: (Element) async throws -> Bool) async rethrows -> Int? {
+        for (index, element) in enumerated() {
+            let matches = try await predicate(element)
+            if matches {
+                return index
+            }
+        }
+        return nil
+    }
+
     /// Returns the last element of the sequence that satisfies the given predicate.
     /// - Parameter predicate: A closure that takes an element of the sequence as its argument
     /// and returns a Boolean value indicating whether the element is a match.
