@@ -94,6 +94,13 @@ public actor ViewStorage: Sendable {
         fields[key] = value
     }
 
+    /// Remove a certain field.
+    /// - Parameters:
+    ///     - key: The key.
+    public func removeField(key: String) {
+        fields.removeValue(forKey: key)
+    }
+
     /// Get the element of a certain field.
     /// - Parameter key: The key.
     /// - Returns: The field.
