@@ -11,7 +11,6 @@
             "button-text": "#ffffff",
             "header": "#7f313b",
             "documentation-intro-accent": "var(--color-header)",
-            "documentation-intro-fill": "radial-gradient(circle at top, var(--color-header) 30%, #000 100%)",
             "link": "#ea3358",
             "nav-link-color": "#ea3358",
             "nav-dark-link-color": "#ea3358",

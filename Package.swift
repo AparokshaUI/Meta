@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 //
 //  Package.swift
 //  Meta
@@ -36,5 +36,6 @@ let package = Package(
             dependencies: ["SampleBackends"],
             path: "Tests/DemoApp"
         )
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )
