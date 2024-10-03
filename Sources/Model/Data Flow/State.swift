@@ -20,6 +20,7 @@ public struct State<Value>: StateProtocol {
             rawValue = newValue
             content.update = true
             StateManager.updateViews(force: forceUpdates)
+            writeValue?(newValue)
         }
     }
 
@@ -51,16 +52,35 @@ public struct State<Value>: StateProtocol {
     /// The closure for initializing the state property's value.
     var getInitialValue: () -> Value
 
+    /// Perform additional operations when the value changes.
+    var writeValue: ((Value) -> Void)?
+
     /// The content.
     let content: StateContent = .init()
 
     /// Initialize a property representing a state in the view with an autoclosure.
     /// - Parameters:
     ///     - wrappedValue: The wrapped value.
-    ///     - id: An explicit identifier.
     ///     - forceUpdates: Whether to force update all available views when the property gets modified.
     public init(wrappedValue: @autoclosure @escaping () -> Value, forceUpdates: Bool = false) {
         getInitialValue = wrappedValue
+        self.forceUpdates = forceUpdates
+    }
+
+    /// Initialize a property representing a state in the view with an explicit closure.
+    /// - Parameters:
+    ///     - wrappedValue: Get the wrapped value.
+    ///     - writeValue: Perform additional operations when the value changes.
+    ///     - forceUpdates: Whether to force update all available views when the property gets modified.
+    ///
+    /// This initializer can be used to get data from the disk.
+    public init(
+        wrappedValue: @escaping () -> Value,
+        writeValue: ((Value) -> Void)? = nil,
+        forceUpdates: Bool = false
+    ) {
+        getInitialValue = wrappedValue
+        self.writeValue = writeValue
         self.forceUpdates = forceUpdates
     }
 
